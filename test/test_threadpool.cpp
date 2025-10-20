@@ -7,17 +7,25 @@ constexpr size_t TEST_QUEUE_SIZE = 64;
 
 TEST(ThreadPoolTests, InitAndFinalize) {
     // Create a ThreadPool instance with the template parameter.
-    rts::Runtime<TEST_QUEUE_SIZE> pool(2);
+
 
     // Initialize with 4 threads.
     EXPECT_NO_THROW({
-        pool.init();
-    }) << "ThreadPool::init() should not throw.";
+        rts::initialize_runtime<>();
+    }) << "initialize_runtime() should not throw.";
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    std::atomic<int> completed {0};
+    for (int i = 0; i < 500; i++) {
+        rts::enqueue([i, &completed]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(i));
+            std::osyncstream(std::cout) <<
+                "[Task Completed] : Slept for " << i << " ms"
+                    << std::endl;
+            ++completed;
+        });
+    }
+    while (completed < 500) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 
-    // Finalize (join threads).
-    EXPECT_NO_THROW({
-        pool.finalize();
-    }) << "ThreadPool::finalize() should not throw.";
 }

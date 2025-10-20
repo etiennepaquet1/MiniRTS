@@ -18,7 +18,6 @@ add_library(MiniRTS_lib
         runtime/Worker.cpp
         runtime/Task.cpp
         runtime/Runtime.cpp
-        runtime/Runtime.h
 )
 
 target_include_directories(MiniRTS_lib
