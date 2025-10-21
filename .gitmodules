@@ -1,0 +1,3 @@
+[submodule "external/WorkStealingQueue"]
+	path = external/WorkStealingQueue
+	url = git@github.com:etiennepaquet1/WorkStealingQueue.git
