@@ -26,31 +26,10 @@ namespace rts {
         { t.enqueue(task) } noexcept;
     };
 
-    class AnyThreadPool {
-        std::shared_ptr<void> ptr_;
-
-        std::function<void(const Task&)> enqueue_fn_;
-        std::function<void()> init_fn_;
-        std::function<void()> finalize_fn_;
-
-    public:
-        template<ThreadPool T>
-        AnyThreadPool(std::unique_ptr<T> pool)
-            : ptr_(std::move(pool)),
-              enqueue_fn_([p = std::static_pointer_cast<T>(ptr_)](const Task& t){ p->enqueue(t); }),
-              init_fn_([p = std::static_pointer_cast<T>(ptr_)]() { p->init(); }),
-              finalize_fn_([p = std::static_pointer_cast<T>(ptr_)](){ p->finalize(); })
-        {}
-        void enqueue(const Task& t) { enqueue_fn_(t); }
-        void init() { init_fn_(); }
-        void finalize() { finalize_fn_(); }
-    };
-
-
     class DefaultThreadPool {
         static constexpr size_t kDefaultThreadPoolCapacity = kDefaultCapacity;
 
-        std::vector<Worker> workers_;
+        std::vector<Worker> workers_; // deleting running std::thread objects? ub
         size_t num_threads_;
         std::shared_ptr<std::atomic<bool>> stop_flag_;
         int round_robin_;
@@ -65,7 +44,12 @@ namespace rts {
                 round_robin_(0),
                 queue_capacity_(queue_capacity) {}
 
-        ~DefaultThreadPool() = default;
+        ~DefaultThreadPool() {
+            stop_flag_->store(true);
+            for (auto& worker : workers_) {
+                worker.join();
+            }
+        }
 
         void init() noexcept {
             workers_.reserve(num_threads_);
