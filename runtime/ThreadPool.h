@@ -83,10 +83,17 @@ namespace rts {
         }
 
         void enqueue(const Task& task) noexcept {
-            workers_[round_robin_++].enqueue(task);
-            if (round_robin_ == num_threads_) {
-                round_robin_ = 0;
+            assert(task.func);
+            // round robin until one of the queues has space
+            while (!workers_[round_robin_].try_enqueue(task)) {
+                round_robin_++;
+                if (round_robin_ == num_threads_)
+                    round_robin_ = 0;
             }
+            // Avoid picking same Worker multiple times in a roq
+            round_robin_++;
+            if (round_robin_ == num_threads_)
+                round_robin_ = 0;
         }
     };
 
