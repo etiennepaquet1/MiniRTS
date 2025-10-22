@@ -25,6 +25,8 @@ target_include_directories(MiniRTS_lib
         ${CMAKE_SOURCE_DIR}/runtime
         ${CMAKE_SOURCE_DIR}/external
         ${CMAKE_SOURCE_DIR}/external/WorkStealingQueue/include
+        ${CMAKE_SOURCE_DIR}/external/SPSCQueue/include
+
 )
 
 # ─────────────────────────────────────────────
