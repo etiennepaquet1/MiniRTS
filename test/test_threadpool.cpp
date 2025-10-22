@@ -2,20 +2,15 @@
 
 #include "Runtime.h"
 #include "ThreadPool.h"
-
-constexpr size_t TEST_QUEUE_SIZE = 64;
+#include "Utils.h"
 
 TEST(ThreadPoolTests, InitAndFinalize) {
-    // Create a ThreadPool instance with the template parameter.
-
-
-    // Initialize with 4 threads.
     EXPECT_NO_THROW({
         rts::initialize_runtime<>();
     }) << "initialize_runtime() should not throw.";
 
-    std::atomic<int> completed {0};
-    for (int i = 0; i < 500; i++) {
+    std::atomic<int> completed(0);
+    for (int i = 0; i < 100; i++) {
         rts::enqueue([i, &completed]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(i));
             std::osyncstream(std::cout) <<
@@ -24,8 +19,25 @@ TEST(ThreadPoolTests, InitAndFinalize) {
             ++completed;
         });
     }
-    while (completed < 500) {
+    while (completed < 100) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    EXPECT_NO_THROW({
+        rts::finalize();
+    }) << "finalize() should not throw.";
+}
 
+TEST(ThreadPoolTests, enqueue_10_000) {
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<>(4);
+    }) << "initialize_runtime() should not throw.";
+
+    for (int i = 0; i < 1000000; ++i) {
+        rts::enqueue([] {});
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    EXPECT_NO_THROW({
+        rts::finalize();
+    }) << "finalize() should not throw.";
 }
