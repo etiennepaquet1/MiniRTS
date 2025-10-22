@@ -5,6 +5,7 @@
 
 #include "Task.h"
 #include "WorkStealingQueue/include/WorkStealingQueue.h"
+#include "SPSCQueue/include/rigtorp/SPSCQueue.h"
 #include "Utils.h"
 
 
@@ -44,16 +45,24 @@ public:
                     ++local_counter;
                 }
             }
+            std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_
+                << ", Local counter: " << local_counter <<  std::endl;
         });
     }
 
     void join() {
-        thread_.join();
+        if (thread_.joinable())
+            thread_.join();
     }
 
     void enqueue(const Task& task) noexcept {
         assert(task.func);
         spscq_->push(task);
+    }
+
+    bool try_enqueue(const Task& task) noexcept {
+        assert(task.func);
+        return spscq_->try_push(task);
     }
 };
 
