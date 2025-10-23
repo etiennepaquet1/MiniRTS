@@ -1,0 +1,55 @@
+#pragma once
+
+#include <memory>
+#include <mutex>
+
+#include "SharedState.h"
+#include "Future.h"
+#include "Task.h"
+
+
+namespace rts {
+
+    void enqueue(const Task&) noexcept;
+
+    template<typename T>
+    class Promise {
+        std::shared_ptr<SharedState<T>> state_;
+
+    public:
+        Promise() noexcept : state_(std::make_shared<SharedState<T>>()) {}
+
+        Future<T> get_future() noexcept { return Future<T>(state_); }
+
+        template<typename U = T>
+        void set_value(U&& value) noexcept requires (!std::is_void_v<U>) {
+            {
+                std::lock_guard lk(state_->mtx);
+                state_->value = std::move(value);
+                state_->ready.store(true, std::memory_order_release);
+            }
+            state_->cv.notify_all();
+            for (auto& cont : state_->continuations)
+                enqueue(std::move(cont));
+        }
+
+        template<typename U = T>
+        void set_value() noexcept requires std::is_void_v<U> {
+            {
+                std::lock_guard lk(state_->mtx);
+                state_->ready.store(true, std::memory_order_release);
+            }
+            state_->cv.notify_all();
+            for (auto& cont : state_->continuations)
+                enqueue(std::move(cont));
+        }
+
+        void set_exception(std::exception_ptr e) noexcept {
+            state_->exception = e;
+            state_->ready.store(true, std::memory_order_release);
+            state_->cv.notify_all();
+            for (auto& cont : state_->continuations)
+                enqueue(std::move(cont));
+        }
+    };
+}
