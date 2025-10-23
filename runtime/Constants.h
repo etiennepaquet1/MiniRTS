@@ -1,0 +1,14 @@
+#pragma once
+
+#include <cstddef>
+
+
+namespace rts {
+
+#ifdef __cpp_lib_hardware_interference_size
+    inline constexpr size_t kCacheLine = std::hardware_destructive_interference_size;
+#else
+    inline constexpr size_t kCacheLine = 64;
+#endif
+    inline constexpr size_t kDefaultCapacity = 1024;
+}
