@@ -4,12 +4,11 @@
 #include <mutex>
 #include "SharedState.h"
 
-namespace rts {
+namespace rts::async {
 
     // Fwd declaration to avoid circular dependency
     template<typename T>
         class Promise;
-
     template<typename T>
     class Future {
         std::shared_ptr<SharedState<T>> state_;

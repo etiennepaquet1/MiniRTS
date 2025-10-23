@@ -7,7 +7,7 @@
 #include <vector>
 #include <functional>
 
-namespace rts {
+namespace rts::async {
 
     template <typename T>
     struct SharedState {

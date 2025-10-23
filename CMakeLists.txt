@@ -4,6 +4,7 @@ project(MiniRTS LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE Debug)
 
 # For GCC and Clang
 add_compile_options(-Wno-interference-size)
@@ -13,33 +14,24 @@ include(FetchContent)
 # ─────────────────────────────────────────────
 # Core library
 # ─────────────────────────────────────────────
-add_library(MiniRTS_lib
+add_library(Runtime
         runtime/ThreadPool.cpp
         runtime/Worker.cpp
         runtime/Task.cpp
         runtime/Runtime.cpp
 )
 
-target_include_directories(MiniRTS_lib
+target_include_directories(Runtime
         PUBLIC
         ${CMAKE_SOURCE_DIR}/runtime
+        ${CMAKE_SOURCE_DIR}/async
         ${CMAKE_SOURCE_DIR}/external
         ${CMAKE_SOURCE_DIR}/external/WorkStealingQueue/include
         ${CMAKE_SOURCE_DIR}/external/SPSCQueue/include
-
 )
 
 # ─────────────────────────────────────────────
-# Main executable
-# ─────────────────────────────────────────────
-#add_executable(MiniRTS
-#        main.cpp       # create this file if not present
-#)
-#
-#target_link_libraries(MiniRTS PRIVATE MiniRTS_lib)
-
-# ─────────────────────────────────────────────
-# Optional: GoogleTest
+# GoogleTest
 # ─────────────────────────────────────────────
 option(BUILD_TESTS "Build unit tests" ON)
 
@@ -55,13 +47,13 @@ if(BUILD_TESTS)
     enable_testing()
 
     add_executable(MiniRTS_tests
-            test/test_threadpool.cpp
+            test/test_runtime.cpp
     )
 
     target_link_libraries(MiniRTS_tests
             PRIVATE
             gtest_main
-            MiniRTS_lib
+            Runtime
     )
 
     include(GoogleTest)
@@ -69,7 +61,7 @@ if(BUILD_TESTS)
 endif()
 
 # ─────────────────────────────────────────────
-# Optional: Google Benchmark
+# Google Benchmark
 # ─────────────────────────────────────────────
 option(BUILD_BENCHMARKS "Build performance benchmarks" ON)
 
@@ -90,6 +82,6 @@ if(BUILD_BENCHMARKS)
 #    target_link_libraries(MiniRTS_bench
 #            PRIVATE
 #            benchmark::benchmark
-#            MiniRTS_lib
+#            Runtime
 #    )
 endif()

@@ -50,10 +50,8 @@ TEST(ThreadPoolTests, test_async) {
         rts::initialize_runtime<rts::DefaultThreadPool>(1);
     }) << "initialize_runtime() should not throw.";
 
-    rts::SharedState<void> state;
-    rts::Future<void> future(std::make_shared<rts::SharedState<void>>());
-    rts::Promise<void> p;
-    rts::async([] {});
+    rts::enqueue_async([] {});
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     EXPECT_NO_THROW({
         rts::finalize();

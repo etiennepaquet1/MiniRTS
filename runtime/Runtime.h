@@ -7,18 +7,19 @@
 #include "Task.h"
 #include "ThreadPool.h"
 
+namespace rts::async {
+    template <typename T>
+    class Promise;
 
+    template <typename T>
+    class Future;
+}
 
 namespace rts {
 
     class Worker;
     class DefaultThreadPool;
 
-    template <typename T>
-    class Promise;
-
-    template <typename T>
-    class Future;
 
     inline static std::atomic<bool> running{false};
     inline static void* active_thread_pool = nullptr;
@@ -67,10 +68,10 @@ namespace rts {
 
     // TODO: make sure the child tasks are enqueued on same worker
     template<typename F, typename... Args>
-    auto async(F&& f, Args&&... args) -> Future<std::invoke_result_t<F, Args...>> {
+    auto enqueue_async(F&& f, Args&&... args) -> async::Future<std::invoke_result_t<F, Args...>> {
         using T = std::invoke_result_t<F, Args...>;
 
-        Promise<T> p;
+        async::Promise<T> p;
         auto fut = p.get_future();
 
         // Capture the promise by value (moved)

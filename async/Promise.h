@@ -9,8 +9,9 @@
 
 
 namespace rts {
-
     void enqueue(const Task&) noexcept;
+}
+namespace rts::async {
 
     template<typename T>
     class Promise {
@@ -30,7 +31,7 @@ namespace rts {
             }
             state_->cv.notify_all();
             for (auto& cont : state_->continuations)
-                enqueue(std::move(cont));
+                rts::enqueue(std::move(cont));
         }
 
         template<typename U = T>
@@ -41,7 +42,7 @@ namespace rts {
             }
             state_->cv.notify_all();
             for (auto& cont : state_->continuations)
-                enqueue(std::move(cont));
+                rts::enqueue(std::move(cont));
         }
 
         void set_exception(std::exception_ptr e) noexcept {
@@ -49,7 +50,7 @@ namespace rts {
             state_->ready.store(true, std::memory_order_release);
             state_->cv.notify_all();
             for (auto& cont : state_->continuations)
-                enqueue(std::move(cont));
+                rts::enqueue(std::move(cont));
         }
     };
 }
