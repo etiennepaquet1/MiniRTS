@@ -2,13 +2,23 @@
 
 #include <memory>
 #include <mutex>
+#include <syncstream>
+
 #include "SharedState.h"
+#include "Task.h"
+#include "Utils.h"
+
+namespace rts {
+    void enqueue(const Task&) noexcept;
+}
 
 namespace rts::async {
 
+
+    template <typename T>
+    class Promise;
     // Fwd declaration to avoid circular dependency
-    template<typename T>
-        class Promise;
+
     template<typename T>
     class Future {
         std::shared_ptr<SharedState<T>> state_;
@@ -68,5 +78,46 @@ namespace rts::async {
             }
             return fut_next;
         }
+
+        template<typename F>
+        Future<std::invoke_result_t<F>> then(F &&f);
+
+        // template <typename... Fs>
+        // then_all()
     };
+
+    template <>
+    template <typename F>
+    Future<std::invoke_result_t<F>> Future<void>::then(F&& f) {
+        using U = std::invoke_result_t<F>;
+        Promise<U> p;
+        auto fut_next = p.get_future();
+
+        auto cont = [func = std::forward<F>(f), p = std::move(p)]() mutable {
+            try {
+                if constexpr(std::is_void_v<U>) {
+                    func();
+                    debug_print("Set value");
+                    p.set_value();
+                } else {
+                    p.set_value(func());
+                }
+            } catch (...) {
+                p.set_exception(std::current_exception());
+            }
+        };
+        {
+            std::lock_guard lk(state_->mtx);
+            // if already ready, run immediately
+            if (is_ready()) {
+                debug_print("Global enqueue");
+                enqueue(std::move(cont));
+            } else {
+                // otherwise register continuation
+                debug_print("Continuation");
+                state_->continuations.push_back(std::move(cont));
+            }
+        }
+        return fut_next;
+    }
 }
