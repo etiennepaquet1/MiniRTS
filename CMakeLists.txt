@@ -14,15 +14,10 @@ include(FetchContent)
 # ─────────────────────────────────────────────
 # Core library
 # ─────────────────────────────────────────────
-add_library(Runtime
-        runtime/ThreadPool.cpp
-        runtime/Worker.cpp
-        runtime/Task.cpp
-        runtime/Runtime.cpp
-)
+add_library(Runtime INTERFACE)
 
 target_include_directories(Runtime
-        PUBLIC
+        INTERFACE
         ${CMAKE_SOURCE_DIR}/runtime
         ${CMAKE_SOURCE_DIR}/async
         ${CMAKE_SOURCE_DIR}/external

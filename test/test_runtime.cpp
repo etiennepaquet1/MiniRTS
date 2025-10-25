@@ -50,8 +50,14 @@ TEST(ThreadPoolTests, test_async) {
         rts::initialize_runtime<rts::DefaultThreadPool>(1);
     }) << "initialize_runtime() should not throw.";
 
-    rts::enqueue_async([] {});
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    for (int i = 0; i < 10000; i++)
+    {
+        auto fut = rts::enqueue_async([] {
+           // std::this_thread::sleep_for(std::chrono::milliseconds(1));
+       });
+        std::this_thread::sleep_for(std::chrono::nanoseconds(i));
+        fut.then([]{});
+    }
 
     EXPECT_NO_THROW({
         rts::finalize();
