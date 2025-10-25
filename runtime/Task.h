@@ -3,12 +3,17 @@
 #include <functional>
 
 struct Task {
-    Task(const Task&) noexcept = default;
+    Task() noexcept = default;
     Task(Task&&) noexcept = default;
+    Task& operator=(Task&&) noexcept = default;
+
+    // Task is move-only
+    Task(const Task&) = delete;
+    Task& operator=(const Task&) = delete;
 
     template <std::invocable F>
     Task(F&& f) : func(std::forward<F>(f)) {}
 
-    std::function<void()> func;
+    std::move_only_function<void()> func;
 };
 

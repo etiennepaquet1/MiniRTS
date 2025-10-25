@@ -1,6 +1,6 @@
 [submodule "external/WorkStealingQueue"]
 	path = external/WorkStealingQueue
 	url = git@github.com:etiennepaquet1/WorkStealingQueue.git
-[submodule "external/SPSCQueue"]
-	path = external/SPSCQueue
-	url = https://github.com/rigtorp/SPSCQueue.git
+[submodule "external/MPMCQueue"]
+	path = external/MPMCQueue
+	url = https://github.com/rigtorp/MPMCQueue.git

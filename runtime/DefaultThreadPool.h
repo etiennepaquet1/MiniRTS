@@ -10,17 +10,18 @@
 #include "ThreadPool.h"
 
 namespace rts {
+    inline std::atomic<int> threadpool_enqueue {0};
 
     class DefaultThreadPool {
 
-        std::vector<Worker> workers_; // deleting running std::thread objects? ub
+        std::vector<Worker> workers_;
         size_t num_threads_;
         std::shared_ptr<std::atomic<bool>> stop_flag_;
         int round_robin_;
         size_t queue_capacity_;
 
     public:
-        DefaultThreadPool(
+        explicit DefaultThreadPool(
             size_t num_threads = std::thread::hardware_concurrency(),
             size_t queue_capacity = kDefaultCapacity) noexcept :
                 num_threads_(num_threads),
@@ -50,10 +51,11 @@ namespace rts {
             }
         }
 
-        void enqueue(const Task& task) noexcept {
+        void enqueue(Task&& task) noexcept {
             assert(task.func);
+            ++threadpool_enqueue;
             // round robin until one of the queues has space
-            while (!workers_[round_robin_].try_enqueue(task)) {
+            while (!workers_[round_robin_].try_enqueue(std::move(task))) {
                 round_robin_++;
                 if (round_robin_ == num_threads_)
                     round_robin_ = 0;
