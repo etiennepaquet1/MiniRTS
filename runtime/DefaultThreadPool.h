@@ -13,14 +13,14 @@ namespace rts {
 
     class DefaultThreadPool {
 
-        std::vector<Worker> workers_; // deleting running std::thread objects? ub
+        std::vector<Worker> workers_;
         size_t num_threads_;
         std::shared_ptr<std::atomic<bool>> stop_flag_;
         int round_robin_;
         size_t queue_capacity_;
 
     public:
-        DefaultThreadPool(
+        explicit DefaultThreadPool(
             size_t num_threads = std::thread::hardware_concurrency(),
             size_t queue_capacity = kDefaultCapacity) noexcept :
                 num_threads_(num_threads),
