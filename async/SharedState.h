@@ -15,11 +15,8 @@ namespace rts::async {
         std::condition_variable cv;          // used only by get()
         std::atomic<bool> ready{false};      // fast path for continuations
 
-
         std::optional<T> value;
-
         std::exception_ptr exception;
-
         std::vector<std::function<void()>> continuations;  // registered callbacks
     };
 
@@ -31,9 +28,7 @@ namespace rts::async {
         std::atomic<bool> ready{false};      // fast path for continuations
 
         std::exception_ptr exception;
-
         std::vector<std::function<void()>> continuations;  // registered callbacks
     };
-
 
 }

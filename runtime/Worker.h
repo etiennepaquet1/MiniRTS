@@ -3,7 +3,6 @@
 #include <syncstream>
 #include <thread>
 
-#include "Runtime.h"
 #include "Task.h"
 #include "WorkStealingQueue/include/WorkStealingQueue.h"
 #include "SPSCQueue/include/rigtorp/SPSCQueue.h"
@@ -11,6 +10,10 @@
 
 
 namespace rts {
+
+    class Worker;
+    inline thread_local Worker* tls_worker = nullptr;
+
     class Worker {
         using WSQ = WorkStealingQueue<Task>;
         using SPSCQ = rigtorp::SPSCQueue<Task>;
@@ -32,10 +35,15 @@ namespace rts {
 
         void run() noexcept {
             thread_ = std::thread([this] {
+                debug_print("Set tls_worker");
+                tls_worker = this;
                 pin_to_core(core_affinity_);
+
                 long local_counter {0};
+
                 while (!shutdown_requested_->load(std::memory_order_relaxed)) {
                     if (wsq_->empty()) {
+                        // Transfer as many items from spscq_ as possible.
                         while (!spscq_->empty() && wsq_->size() != wsq_->capacity()) {
                             wsq_->emplace(*spscq_->front());
                             spscq_->pop();
@@ -52,7 +60,6 @@ namespace rts {
                 std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_
                     << ", Local counter: " << local_counter <<  std::endl;
             });
-            tls_worker = this;
         }
 
         void join() noexcept {

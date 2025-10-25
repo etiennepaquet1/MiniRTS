@@ -6,7 +6,7 @@
 #include "SharedState.h"
 #include "Future.h"
 #include "Task.h"
-
+#include "Worker.h"
 
 namespace rts {
     void enqueue(const Task&) noexcept;
@@ -41,8 +41,11 @@ namespace rts::async {
                 state_->ready.store(true, std::memory_order_release);
             }
             state_->cv.notify_all();
-            for (auto& cont : state_->continuations)
-                rts::enqueue(std::move(cont));
+            for (auto& cont : state_->continuations) {
+                debug_print("tls_worker->enqueue() ");
+                assert(tls_worker);
+                tls_worker->enqueue(std::move(cont));
+            }
         }
 
         void set_exception(std::exception_ptr e) noexcept {

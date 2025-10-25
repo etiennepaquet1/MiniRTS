@@ -10,7 +10,6 @@
 namespace rts::async {
     template <typename T>
     class Promise;
-
     template <typename T>
     class Future;
 }
@@ -20,15 +19,12 @@ namespace rts {
     class Worker;
     class DefaultThreadPool;
 
-
     inline static std::atomic<bool> running{false};
     inline static void* active_thread_pool = nullptr;
 
-    // Function pointer to enqueue implementation
+    // Function pointer to enqueue() implementation.
     inline static void (*enqueue_fn)(const Task&) = nullptr;
     inline static void (*finalize_fn)() = nullptr;
-
-    inline thread_local Worker* tls_worker = nullptr;
 
     template <ThreadPool T> // TODO: try to find a way to make default thread pool parameter
     bool initialize_runtime(unsigned num_threads = std::thread::hardware_concurrency()) noexcept {
@@ -47,8 +43,8 @@ namespace rts {
             finalize_fn = []() noexcept {
                 auto* p = static_cast<T*>(active_thread_pool);
                 if (!p) return;
-                p->finalize();      // must join/stop threads here
-                delete p;           // not ~T(); use delete
+                p->finalize();
+                delete p;
                 active_thread_pool = nullptr;
                 running.store(false, std::memory_order_release);
             };

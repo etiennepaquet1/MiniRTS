@@ -4,6 +4,7 @@
 
 
 namespace rts {
+    constexpr bool DEBUG = false;
 
 #ifdef __cpp_lib_hardware_interference_size
     inline constexpr size_t kCacheLine = std::hardware_destructive_interference_size;
