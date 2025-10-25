@@ -23,22 +23,23 @@ namespace rts {
     inline static void* active_thread_pool = nullptr;
 
     // Function pointer to enqueue() implementation.
-    inline static void (*enqueue_fn)(const Task&) = nullptr;
+    inline static void (*enqueue_fn)(Task&&) = nullptr;
     inline static void (*finalize_fn)() = nullptr;
 
     template <ThreadPool T> // TODO: try to find a way to make default thread pool parameter
-    bool initialize_runtime(unsigned num_threads = std::thread::hardware_concurrency()) noexcept {
+    bool initialize_runtime(unsigned num_threads = std::thread::hardware_concurrency(),
+                            unsigned queue_capacity = kDefaultCapacity) noexcept {
         bool expected = false;
         if (running.compare_exchange_strong(expected, true,
                                             std::memory_order_release,
                                             std::memory_order_relaxed)) {
-            auto* pool = new T(num_threads);
+            auto* pool = new T(num_threads, queue_capacity);
             pool->init();
 
             active_thread_pool = pool;
-            enqueue_fn = [](const Task& task) noexcept {
+            enqueue_fn = [](Task&& task) noexcept {
                 assert(task.func);
-                static_cast<T*>(active_thread_pool)->enqueue(task);
+                static_cast<T*>(active_thread_pool)->enqueue(std::move(task));
             };
             finalize_fn = []() noexcept {
                 auto* p = static_cast<T*>(active_thread_pool);
@@ -53,9 +54,9 @@ namespace rts {
         return false;
     }
 
-    inline void enqueue(const Task& task) noexcept {
+    inline void enqueue(Task&& task) noexcept {
         assert(task.func);
-        enqueue_fn(task);
+        enqueue_fn(std::move(task));
     }
 
     inline void finalize() noexcept {

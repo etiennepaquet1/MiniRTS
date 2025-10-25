@@ -9,11 +9,12 @@
 #include "Utils.h"
 
 namespace rts {
-    void enqueue(const Task&) noexcept;
+    void enqueue(Task &&) noexcept;
+    inline std::atomic<int> global_enqueue_counter;
+    inline std::atomic<int> continuation_counter;
 }
 
 namespace rts::async {
-
 
     template <typename T>
     class Promise;
@@ -108,12 +109,12 @@ namespace rts::async {
         };
         {
             std::lock_guard lk(state_->mtx);
-            // if already ready, run immediately
             if (is_ready()) {
+                ++global_enqueue_counter;
                 debug_print("Global enqueue");
                 enqueue(std::move(cont));
             } else {
-                // otherwise register continuation
+                ++continuation_counter;
                 debug_print("Continuation");
                 state_->continuations.push_back(std::move(cont));
             }

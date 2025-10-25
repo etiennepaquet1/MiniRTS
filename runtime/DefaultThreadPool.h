@@ -10,6 +10,7 @@
 #include "ThreadPool.h"
 
 namespace rts {
+    inline std::atomic<int> threadpool_enqueue {0};
 
     class DefaultThreadPool {
 
@@ -50,10 +51,11 @@ namespace rts {
             }
         }
 
-        void enqueue(const Task& task) noexcept {
+        void enqueue(Task&& task) noexcept {
             assert(task.func);
+            ++threadpool_enqueue;
             // round robin until one of the queues has space
-            while (!workers_[round_robin_].try_enqueue(task)) {
+            while (!workers_[round_robin_].try_enqueue(std::move(task))) {
                 round_robin_++;
                 if (round_robin_ == num_threads_)
                     round_robin_ = 0;
