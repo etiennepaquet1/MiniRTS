@@ -69,14 +69,14 @@ if(BUILD_BENCHMARKS)
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(benchmark)
 
-#    add_executable(MiniRTS_bench
-#            benchmarks/bench_task.cpp
-#            benchmarks/bench_threadpool.cpp
-#    )
-#
-#    target_link_libraries(MiniRTS_bench
-#            PRIVATE
-#            benchmark::benchmark
-#            Runtime
-#    )
+    add_executable(MiniRTS_bench
+            bench/bench.cpp
+    )
+
+    target_link_libraries(MiniRTS_bench
+            PRIVATE
+            benchmark::benchmark
+            Runtime
+    )
+
 endif()

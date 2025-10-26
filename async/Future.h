@@ -108,10 +108,8 @@ namespace rts::async {
         {
             std::lock_guard lk(state_->mtx);
             if (is_ready()) {
-                debug_print("Global enqueue");
                 enqueue(std::move(cont));
             } else {
-                debug_print("Continuation");
                 state_->continuations.push_back(std::move(cont));
             }
         }
