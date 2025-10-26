@@ -81,9 +81,9 @@ namespace rts {
         }
 
         // Used by the worker thread to enqueue continuations to its own work-stealing queue.
-        void enqueue_local(const Task& task) const noexcept {
+        bool enqueue_local(const Task& task) const noexcept {
             assert(task.func);
-            wsq_->emplace(task);
+            return wsq_->try_emplace(task);
         }
     };
 }

@@ -88,6 +88,7 @@ namespace rts::async {
     template <>
     template <typename F>
     Future<std::invoke_result_t<F>> Future<void>::then(F&& f) {
+
         using U = std::invoke_result_t<F>;
         Promise<U> p;
         auto fut_next = p.get_future();

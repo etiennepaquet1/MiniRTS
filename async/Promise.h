@@ -38,7 +38,9 @@ namespace rts::async {
                 state_->ready.store(true, std::memory_order_release);
                 for (auto& cont : state_->continuations) {
                     assert(tls_worker);
-                    tls_worker->enqueue_local(std::move(cont)); // Will block if wsq is full ?
+                    if (!tls_worker->enqueue_local(std::move(cont)))
+                        // Right where we started
+                        rts::enqueue(std::move(cont));
                 }
             }
         }
