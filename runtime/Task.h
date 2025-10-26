@@ -8,12 +8,12 @@ struct Task {
     Task& operator=(Task&&) noexcept = default;
 
     // Task is move-only
-    Task(const Task&) = delete;
-    Task& operator=(const Task&) = delete;
+    Task(const Task&) = default;
+    Task& operator=(const Task&) = default;
 
     template <std::invocable F>
     Task(F&& f) : func(std::forward<F>(f)) {}
 
-    std::move_only_function<void()> func;
+    std::function<void()> func;
 };
 

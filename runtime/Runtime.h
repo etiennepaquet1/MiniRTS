@@ -6,6 +6,7 @@
 
 #include "Task.h"
 #include "ThreadPool.h"
+#include "Constants.h"
 
 namespace rts::async {
     template <typename T>
@@ -23,8 +24,8 @@ namespace rts {
     inline static void* active_thread_pool = nullptr;
 
     // Function pointer to enqueue() implementation.
-    inline static void (*enqueue_fn)(Task&&) = nullptr;
-    inline static void (*finalize_fn)() = nullptr;
+    inline static void (*enqueue_fn)(const Task&) = nullptr;
+    inline static void (*finalize_fn)(ShutdownMode mode) = nullptr;
 
     template <ThreadPool T> // TODO: try to find a way to make default thread pool parameter
     bool initialize_runtime(unsigned num_threads = std::thread::hardware_concurrency(),
@@ -37,14 +38,14 @@ namespace rts {
             pool->init();
 
             active_thread_pool = pool;
-            enqueue_fn = [](Task&& task) noexcept {
+            enqueue_fn = [](const Task& task) noexcept {
                 assert(task.func);
-                static_cast<T*>(active_thread_pool)->enqueue(std::move(task));
+                static_cast<T*>(active_thread_pool)->enqueue(task);
             };
-            finalize_fn = []() noexcept {
+            finalize_fn = [](ShutdownMode mode) noexcept {
                 auto* p = static_cast<T*>(active_thread_pool);
                 if (!p) return;
-                p->finalize();
+                p->finalize(mode);
                 delete p;
                 active_thread_pool = nullptr;
                 running.store(false, std::memory_order_release);
@@ -54,16 +55,18 @@ namespace rts {
         return false;
     }
 
-    inline void enqueue(Task&& task) noexcept {
+    inline void enqueue(const Task& task) noexcept {
         assert(task.func);
-        enqueue_fn(std::move(task));
+        enqueue_fn(task);
     }
 
-    inline void finalize() noexcept {
-        finalize_fn();
+    inline void finalize_hard() noexcept {
+        finalize_fn(HARD_SHUTDOWN);
+    }
+    inline void finalize_soft() noexcept {
+        finalize_fn(SOFT_SHUTDOWN);
     }
 
-    // TODO: make sure the child tasks are enqueued on same worker
     template<typename F, typename... Args>
     auto enqueue_async(F&& f, Args&&... args) -> async::Future<std::invoke_result_t<F, Args...>> {
         using T = std::invoke_result_t<F, Args...>;
@@ -87,7 +90,7 @@ namespace rts {
                 p.set_exception(std::current_exception());
             }
         };
-        enqueue(std::move(task));
+        enqueue(task);
         return fut;
     }
 
