@@ -8,7 +8,6 @@
 #include "Worker.h"
 
 namespace rts {
-    inline std::atomic<int> cont_enqueue_counter{0};
 }
 namespace rts::async {
 
@@ -38,10 +37,8 @@ namespace rts::async {
                 std::lock_guard lk(state_->mtx);
                 state_->ready.store(true, std::memory_order_release);
                 for (auto& cont : state_->continuations) {
-                    ++cont_enqueue_counter;
-                    debug_print("tls_worker->enqueue() ");
                     assert(tls_worker);
-                    tls_worker->enqueue(std::move(cont)); // WORKER THREAD CALLS ENQUEUE !!!!!! NONONONONONONO
+                    tls_worker->enqueue_local(std::move(cont)); // Will block if wsq is full ?
                 }
             }
         }

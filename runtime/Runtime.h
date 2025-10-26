@@ -6,6 +6,7 @@
 
 #include "Task.h"
 #include "ThreadPool.h"
+#include "Constants.h"
 
 namespace rts::async {
     template <typename T>
@@ -23,7 +24,7 @@ namespace rts {
     inline static void* active_thread_pool = nullptr;
 
     // Function pointer to enqueue() implementation.
-    inline static void (*enqueue_fn)(Task&&) = nullptr;
+    inline static void (*enqueue_fn)(const Task&) = nullptr;
     inline static void (*finalize_fn)() = nullptr;
 
     template <ThreadPool T> // TODO: try to find a way to make default thread pool parameter
@@ -37,9 +38,9 @@ namespace rts {
             pool->init();
 
             active_thread_pool = pool;
-            enqueue_fn = [](Task&& task) noexcept {
+            enqueue_fn = [](const Task& task) noexcept {
                 assert(task.func);
-                static_cast<T*>(active_thread_pool)->enqueue(std::move(task));
+                static_cast<T*>(active_thread_pool)->enqueue(task);
             };
             finalize_fn = []() noexcept {
                 auto* p = static_cast<T*>(active_thread_pool);
@@ -54,9 +55,9 @@ namespace rts {
         return false;
     }
 
-    inline void enqueue(Task&& task) noexcept {
+    inline void enqueue(const Task& task) noexcept {
         assert(task.func);
-        enqueue_fn(std::move(task));
+        enqueue_fn(task);
     }
 
     inline void finalize() noexcept {
@@ -87,7 +88,7 @@ namespace rts {
                 p.set_exception(std::current_exception());
             }
         };
-        enqueue(std::move(task));
+        enqueue(task);
         return fut;
     }
 
