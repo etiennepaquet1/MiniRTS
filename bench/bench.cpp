@@ -7,7 +7,10 @@
 #include "Promise.h"
 #include "DefaultThreadPool.h"
 
-static void BM_Async_ThreadPool_2D(benchmark::State &state) {
+
+// Measures the latency of enqueuing 1 million empty tasks
+// (e.g. the time between enqueing the first task and finishing the final task
+static void BM_Async_Latency_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
     const size_t num_threads   = static_cast<size_t>(state.range(0));
@@ -27,22 +30,16 @@ static void BM_Async_ThreadPool_2D(benchmark::State &state) {
 
         // Enqueue async tasks
         for (int i = 0; i < LOOP; ++i) {
-            rts::enqueue_async([&func_counter] {
-                ++func_counter; // might affect measurements
-            });
+            rts::enqueue_async([]{});
         }
 
-        // Wait until all tasks are completed
-        while (func_counter.load(std::memory_order_relaxed) < LOOP) {
-            std::this_thread::yield();
-        }
+        state.PauseTiming();
+        rts::finalize_soft();
+        state.ResumeTiming();
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::nano> elapsed = end - start;
 
-        state.PauseTiming();
-        rts::finalize();
-        state.ResumeTiming();
 
         // Record metrics
         state.counters["Threads"]       = num_threads;
@@ -53,7 +50,7 @@ static void BM_Async_ThreadPool_2D(benchmark::State &state) {
 }
 
 // Register combinations of (num_threads, queue_capacity)
-BENCHMARK(BM_Async_ThreadPool_2D)
+BENCHMARK(BM_Async_Latency_1_000_000)
     ->Args({1, 64})
     ->Args({1, 512})
     ->Args({1, 1 << 10})

@@ -23,7 +23,7 @@ TEST(ThreadPoolTests, InitAndFinalize) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     EXPECT_NO_THROW({
-        rts::finalize();
+        rts::finalize_hard();
     }) << "finalize() should not throw.";
 }
 
@@ -41,7 +41,7 @@ TEST(ThreadPoolTests, enqueue_10_000) {
     while (completed < 1000000) {}
 
     EXPECT_NO_THROW({
-        rts::finalize();
+        rts::finalize_hard();
     }) << "finalize() should not throw.";
 }
 
@@ -64,7 +64,7 @@ TEST(ThreadPoolTests, test_async) {
     while (func_counter < LOOP || cont_counter < LOOP) {}
 
     EXPECT_NO_THROW({
-        rts::finalize();
+        rts::finalize_hard();
     }) << "finalize() should not throw.";
 
     std::cout << "func_counter: " << func_counter << std::endl;

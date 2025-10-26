@@ -21,12 +21,12 @@ namespace rts {
         std::thread thread_;
         std::unique_ptr<WSQ> wsq_;
         std::unique_ptr<SPSCQ> spscq_;
-        std::shared_ptr<std::atomic<bool>> shutdown_requested_;
+        std::shared_ptr<std::atomic<int>> shutdown_requested_;
         int core_affinity_;
 
     public:
         Worker(int core_affinity,
-               const std::shared_ptr<std::atomic<bool> > &stop_flag,
+               const std::shared_ptr<std::atomic<int> > &stop_flag,
                size_t queue_capacity) noexcept : wsq_(std::make_unique<WSQ>(queue_capacity)),
                                                  spscq_(std::make_unique<SPSCQ>(queue_capacity)),
                                                  shutdown_requested_(stop_flag),
@@ -42,7 +42,7 @@ namespace rts {
 
                 std::atomic<long> local_counter {0};
 
-                while (!shutdown_requested_->load(std::memory_order_relaxed)) {
+                while (shutdown_requested_->load(std::memory_order_relaxed) != HARD_SHUTDOWN) {
                     if (wsq_->empty()) {
                         // Transfer as many items from spscq_ as possible.
                         while (!spscq_->empty() && wsq_->size() != wsq_->capacity()) {
@@ -57,13 +57,15 @@ namespace rts {
                         assert(t.value().func);
                         t.value().func();
                         ++local_counter;
-                    }
+                    } else if (shutdown_requested_->load(std::memory_order_relaxed) == SOFT_SHUTDOWN
+                               && wsq_->empty() && spscq_->empty())
+                        break;
                 }
                 std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_
-                    << ", Local counter: " << local_counter <<  std::endl;
-                std::osyncstream(std::cout) << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl;
-                std::osyncstream(std::cout) << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl;
-                std::osyncstream(std::cout) << "[Exit]: Largest: " << largest << std::endl;
+                    << ", Local counter: " << local_counter <<  std::endl
+                    << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl
+                    << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl
+                    << "[Exit]: Largest: " << largest << std::endl;
             });
         }
 

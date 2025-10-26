@@ -12,4 +12,11 @@ namespace rts {
     inline constexpr size_t kCacheLine = 64;
 #endif
     inline constexpr size_t kDefaultCapacity = 1024;
+
+
+    enum ShutdownMode {
+        HARD_SHUTDOWN = 1,
+        SOFT_SHUTDOWN = 2
+    };
+
 }

@@ -15,7 +15,7 @@ namespace rts {
 
         std::vector<Worker> workers_;
         size_t num_threads_;
-        std::shared_ptr<std::atomic<bool>> stop_flag_;
+        std::shared_ptr<std::atomic<int>> stop_flag_;
         int round_robin_;
         size_t queue_capacity_;
 
@@ -24,12 +24,12 @@ namespace rts {
             size_t num_threads = std::thread::hardware_concurrency(),
             size_t queue_capacity = kDefaultCapacity) noexcept :
                 num_threads_(num_threads),
-                stop_flag_(std::make_shared<std::atomic<bool> >(false)),
+                stop_flag_(std::make_shared<std::atomic<int> >(0)),
                 round_robin_{0},
                 queue_capacity_(queue_capacity) {}
 
         ~DefaultThreadPool() noexcept {
-            stop_flag_->store(true);
+            stop_flag_->store(HARD_SHUTDOWN, std::memory_order_release);
             for (auto& worker : workers_) {
                 worker.join();
             }
@@ -43,8 +43,8 @@ namespace rts {
             }
         }
 
-        void finalize() noexcept {
-            stop_flag_->store(true, std::memory_order_relaxed);
+        void finalize(ShutdownMode mode) noexcept {
+            stop_flag_->store(mode, std::memory_order_release);
             for (auto& worker : workers_) {
                 worker.join();
             }
