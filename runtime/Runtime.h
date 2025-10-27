@@ -17,7 +17,6 @@ namespace rts::async {
 
 namespace rts {
 
-    class Worker;
     class DefaultThreadPool;
 
     inline static std::atomic<bool> running{false};
@@ -27,9 +26,13 @@ namespace rts {
     inline static void (*enqueue_fn)(const Task&) = nullptr;
     inline static void (*finalize_fn)(ShutdownMode mode) = nullptr;
 
+    // Represents how saturated the worker queues are
+    inline float saturation_cached = 0;
+    // Worker queue capacity (Used for calculating saturation)
+
     template <ThreadPool T> // TODO: try to find a way to make default thread pool parameter
-    bool initialize_runtime(unsigned num_threads = std::thread::hardware_concurrency(),
-                            unsigned queue_capacity = kDefaultCapacity) noexcept {
+    bool initialize_runtime(size_t num_threads = std::thread::hardware_concurrency(),
+                            size_t queue_capacity = kDefaultCapacity) noexcept {
         bool expected = false;
         if (running.compare_exchange_strong(expected, true,
                                             std::memory_order_release,

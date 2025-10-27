@@ -32,6 +32,10 @@ namespace rts {
                                                  shutdown_requested_(stop_flag),
                                                  core_affinity_(core_affinity) {}
 
+        size_t wsq_size() const {
+            return wsq_->size();
+        }
+
         void run() noexcept {
             thread_ = std::thread([this] {
                 size_t largest {0};
@@ -40,7 +44,7 @@ namespace rts {
                 tls_worker = this;
                 pin_to_core(core_affinity_);
 
-                std::atomic<long> local_counter {0};
+                // std::atomic<long> local_counter {0};
 
                 while (shutdown_requested_->load(std::memory_order_relaxed) != HARD_SHUTDOWN) {
                     if (wsq_->empty()) {
@@ -56,13 +60,13 @@ namespace rts {
                     if (t.has_value()) {
                         assert(t.value().func);
                         t.value().func();
-                        ++local_counter;
+                        // ++local_counter;
                     } else if (shutdown_requested_->load(std::memory_order_relaxed) == SOFT_SHUTDOWN
                                && wsq_->empty() && spscq_->empty())
                         break;
                 }
                 std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_
-                    << ", Local counter: " << local_counter <<  std::endl
+                    // << ", Local counter: " << local_counter <<  std::endl
                     << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl
                     << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl
                     << "[Exit]: Largest: " << largest << std::endl;
@@ -81,9 +85,9 @@ namespace rts {
         }
 
         // Used by the worker thread to enqueue continuations to its own work-stealing queue.
-        void enqueue_local(const Task& task) const noexcept {
+        bool enqueue_local(const Task& task) const noexcept {
             assert(task.func);
-            wsq_->emplace(task);
+            return wsq_->try_emplace(task);
         }
     };
 }

@@ -71,7 +71,6 @@ if(BUILD_BENCHMARKS)
 
     add_executable(MiniRTS_bench
             bench/bench.cpp
-            runtime/Enums.h
     )
 
     target_link_libraries(MiniRTS_bench

@@ -50,6 +50,14 @@ namespace rts {
             }
         }
 
+        double compute_saturation() {
+            int sum {0};
+            for (Worker& wkr : workers_) {
+                sum += wkr.wsq_size();
+            }
+            return sum / (workers_.size() * num_threads_);
+        }
+
         void enqueue(const Task& task) noexcept {
             assert(task.func);
             workers_[round_robin_].enqueue(task);

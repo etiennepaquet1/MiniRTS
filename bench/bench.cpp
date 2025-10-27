@@ -9,7 +9,7 @@
 
 
 // Measures the latency of enqueuing 1 million empty tasks
-// (e.g. the time between enqueing the first task and finishing the final task
+// (e.g. the time between enqueuing the first task and finishing the final task
 static void BM_Async_Latency_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
@@ -22,7 +22,6 @@ static void BM_Async_Latency_1_000_000(benchmark::State &state) {
 
         // Initialize runtime with current configuration
         rts::initialize_runtime<rts::DefaultThreadPool>(num_threads, queue_capacity);
-        std::atomic<int> func_counter{0};
 
         state.ResumeTiming();
 
