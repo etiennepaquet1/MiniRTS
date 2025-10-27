@@ -44,7 +44,7 @@ namespace rts {
                 tls_worker = this;
                 pin_to_core(core_affinity_);
 
-                std::atomic<long> local_counter {0};
+                // std::atomic<long> local_counter {0};
 
                 while (shutdown_requested_->load(std::memory_order_relaxed) != HARD_SHUTDOWN) {
                     if (wsq_->empty()) {
@@ -60,13 +60,13 @@ namespace rts {
                     if (t.has_value()) {
                         assert(t.value().func);
                         t.value().func();
-                        ++local_counter;
+                        // ++local_counter;
                     } else if (shutdown_requested_->load(std::memory_order_relaxed) == SOFT_SHUTDOWN
                                && wsq_->empty() && spscq_->empty())
                         break;
                 }
                 std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_
-                    << ", Local counter: " << local_counter <<  std::endl
+                    // << ", Local counter: " << local_counter <<  std::endl
                     << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl
                     << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl
                     << "[Exit]: Largest: " << largest << std::endl;

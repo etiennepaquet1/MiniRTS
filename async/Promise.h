@@ -39,7 +39,8 @@ namespace rts::async {
                 for (auto& cont : state_->continuations) {
                     assert(tls_worker);
                     if (!tls_worker->enqueue_local(cont)) {
-                        // No space in WSQ: Execute it directly
+                        // No space in WSQ: Execute it directly.
+                        assert (cont);
                         cont();
                     }
                 }

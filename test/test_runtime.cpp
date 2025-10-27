@@ -29,21 +29,6 @@ TEST(ThreadPoolTests, InitAndFinalize) {
     }) << "finalize_hard() should not throw.";
 }
 
-TEST(ThreadPoolTests, enqueue_1000_000) {
-    pin_to_core(5);
-    EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(4);
-    }) << "initialize_runtime() should not throw.";
-
-    for (int i = 0; i < 1000000; ++i) {
-        rts::enqueue([] {});
-    }
-
-    EXPECT_NO_THROW({
-        rts::finalize_soft();
-    }) << "finalize() should not throw.";
-
-}
 
 // TEST(ThreadPoolTests, test_then) {
 //     pin_to_core(5);
@@ -65,30 +50,31 @@ TEST(ThreadPoolTests, enqueue_1000_000) {
 //     }) << "finalize() should not throw.";
 // }
 
-// TEST(ThreadPoolTests, test_multiple_then) {
-//     pin_to_core(5);
-//     constexpr int LOOP = 1000000;
-//
-//
-//     EXPECT_NO_THROW({
-//         rts::initialize_runtime<rts::DefaultThreadPool>(1, 1024);
-//     }) << "initialize_runtime() should not throw.";
-//
-//     for (int i = 0; i < LOOP; i++)
-//     {
-//         auto fut = rts::enqueue_async([] {});
-//         fut.then([] {});
-//         fut.then([] {});
-//         fut.then([] {});
-//         fut.then([] {});
-//     }
-//
-//     EXPECT_NO_THROW({
-//         rts::finalize_soft();
-//     }) << "finalize() should not throw.";
-// }
-//
+TEST(ThreadPoolTests, test_multiple_then) {
+    pin_to_core(5);
+    constexpr int LOOP = 10000;
 
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(1, 1024);
+    }) << "initialize_runtime() should not throw.";
+
+    std::atomic<int> counter{0};
+    for (int i = 0; i < LOOP; i++)
+    {
+        auto fut = rts::enqueue_async([&counter] {++counter;});
+        fut.then([&counter] {++counter;});
+        fut.then([&counter] {++counter;});
+        fut.then([&counter] {++counter;});
+        fut.then([&counter] {++counter;});
+        fut.then([&counter] {++counter;});
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize() should not throw.";
+
+    ASSERT_EQ(counter, LOOP * 6);
+}
 
 
 // ─────────────────────────────────────────────────────────────
@@ -103,7 +89,7 @@ struct EnqueueParams {
 
 std::vector<EnqueueParams> GenerateParams() {
     std::vector<EnqueueParams> params;
-    std::vector<size_t> cores       = {1, 2, 3, 4};
+    std::vector<size_t> cores = {1, 2, 3, 4};
     std::vector<size_t> caps = {64, 256, 1024, 4096, 1 << 14, 1 << 16, 1 << 18, 1 << 20};
     std::vector<size_t> loop_counts = {100, 1'000, 10'000, 100'000, 1'000'000};
 
@@ -211,6 +197,49 @@ TEST_P(ThenParamTests, ContinuationStress) {
 INSTANTIATE_TEST_SUITE_P(
     ThreadPoolThenTests,
     ThenParamTests,
+    ::testing::ValuesIn(GenerateParams()),
+    [](const testing::TestParamInfo<EnqueueParams>& info) {
+        std::ostringstream os;
+        os << "Cores" << info.param.num_threads
+           << "_Cap" << info.param.queue_capacity
+           << "_Loop" << info.param.loop_count;
+        return os.str();
+    });
+
+
+class MultipleThenTests : public ::testing::TestWithParam<EnqueueParams> {};
+TEST_P(MultipleThenTests, MultipleThenStress) {
+    const auto& p = GetParam();
+    pin_to_core(5);
+
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+    }) << "initialize_runtime() should not throw.";
+
+    std::atomic<int> counter{0};
+    for (size_t i = 0; i < p.loop_count; ++i) {
+        auto fut = rts::enqueue_async([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+        fut.then([&counter] { ++counter; });
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+
+    ASSERT_EQ(counter.load(), static_cast<int>(p.loop_count * 10));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    MultipleThenTests,
+    MultipleThenTests,
     ::testing::ValuesIn(GenerateParams()),
     [](const testing::TestParamInfo<EnqueueParams>& info) {
         std::ostringstream os;
