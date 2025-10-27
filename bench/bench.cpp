@@ -13,8 +13,8 @@
 static void BM_Async_Latency_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
-    const size_t num_threads   = static_cast<size_t>(state.range(0));
-    const size_t queue_capacity = static_cast<size_t>(state.range(1));
+    const auto num_threads    = static_cast<size_t>(state.range(0));
+    const auto queue_capacity = static_cast<size_t>(state.range(1));
     constexpr int LOOP = 1'000'000;
 
     for (auto _ : state) {

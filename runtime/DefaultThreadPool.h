@@ -13,7 +13,7 @@ namespace rts {
 
     class DefaultThreadPool {
 
-        std::vector<Worker> workers_;
+        std::shared_ptr<std::vector<Worker>> workers_;
         size_t num_threads_;
         std::shared_ptr<std::atomic<int>> stop_flag_;
         int round_robin_;
@@ -30,37 +30,37 @@ namespace rts {
 
         ~DefaultThreadPool() noexcept {
             stop_flag_->store(HARD_SHUTDOWN, std::memory_order_release);
-            for (auto& worker : workers_) {
+            for (auto& worker : *workers_) {
                 worker.join();
             }
         }
 
         void init() noexcept {
-            workers_.reserve(num_threads_);
+            workers_->reserve(num_threads_);
             for (int i = 0; i < num_threads_; i++) {
-                workers_.emplace_back(i, stop_flag_, queue_capacity_);
-                workers_.back().run();
+                workers_->emplace_back(i, stop_flag_, queue_capacity_, workers_);
+                workers_->back().run();
             }
         }
 
         void finalize(ShutdownMode mode) noexcept {
             stop_flag_->store(mode, std::memory_order_release);
-            for (auto& worker : workers_) {
+            for (auto& worker : *workers_) {
                 worker.join();
             }
         }
 
         double compute_saturation() {
-            int sum {0};
-            for (Worker& wkr : workers_) {
+            size_t sum {0};
+            for (Worker& wkr : *workers_) {
                 sum += wkr.wsq_size();
             }
-            return sum / (workers_.size() * num_threads_);
+            return sum / (workers_->size() * num_threads_);
         }
 
         void enqueue(const Task& task) noexcept {
             assert(task.func);
-            workers_[round_robin_].enqueue(task);
+            (*workers_)[round_robin_].enqueue(task);
             round_robin_++;
             if (round_robin_ == num_threads_)
                 round_robin_ = 0;

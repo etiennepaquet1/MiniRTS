@@ -22,27 +22,40 @@ namespace rts {
         std::unique_ptr<WSQ> wsq_;
         std::unique_ptr<SPSCQ> spscq_;
         std::shared_ptr<std::atomic<int>> shutdown_requested_;
+        std::shared_ptr<std::vector<Worker>> workers_vector_;
         int core_affinity_;
 
     public:
         Worker(int core_affinity,
                const std::shared_ptr<std::atomic<int> > &stop_flag,
-               size_t queue_capacity) noexcept : wsq_(std::make_unique<WSQ>(queue_capacity)),
-                                                 spscq_(std::make_unique<SPSCQ>(queue_capacity)),
-                                                 shutdown_requested_(stop_flag),
-                                                 core_affinity_(core_affinity) {}
+               size_t queue_capacity,
+               std::shared_ptr<std::vector<Worker>> workers_vector) noexcept :
+                                                wsq_(std::make_unique<WSQ>(queue_capacity)),
+                                                spscq_(std::make_unique<SPSCQ>(queue_capacity)),
+                                                shutdown_requested_(stop_flag),
+                                                core_affinity_(core_affinity),
+                                                workers_vector_(workers_vector){}
 
-        size_t wsq_size() const {
+        [[nodiscard]] size_t wsq_size() const {
             return wsq_->size();
         }
 
-        void run() noexcept {
+        [[nodiscard]] std::optional<Task> steal() const {
+            return wsq_->steal();
+        }
+
+        void run() noexcept { // TODO: remove work-stealing on single worker
             thread_ = std::thread([this] {
-                size_t largest {0};
+                // size_t largest {0};
 
                 debug_print("Set tls_worker");
                 tls_worker = this;
                 pin_to_core(core_affinity_);
+
+                // Pointers to facilitate stealing from other workers
+                Worker* workers_begin {workers_vector_.get()->data()};
+                Worker* workers_end {workers_begin + workers_vector_.get()->size()};
+                Worker* next_victim {workers_begin};
 
                 // std::atomic<long> local_counter {0};
 
@@ -53,23 +66,43 @@ namespace rts {
                             wsq_->emplace(*spscq_->front());
                             spscq_->pop();
                         }
-                        largest = std::max(largest, wsq_->size());
-                        // if wsq_ still empty try stealing from other queues
+                        // largest = std::max(largest, wsq_->size());
                     }
                     std::optional<Task> t = wsq_->pop();
                     if (t.has_value()) {
                         assert(t.value().func);
                         t.value().func();
                         // ++local_counter;
-                    } else if (shutdown_requested_->load(std::memory_order_relaxed) == SOFT_SHUTDOWN
-                               && wsq_->empty() && spscq_->empty())
-                        break;
+                    } else {
+                        // If wsq_ still empty try stealing from another queue.
+                        if (next_victim != this) {
+                            auto victim_queue_size = next_victim->wsq_size();
+                            // Steal half their queue.
+                            for (int i = 0; i < victim_queue_size/2; i++) {
+                                auto stolen_task = next_victim->steal();
+                                if (stolen_task.has_value()) {
+                                    // TODO: remove temp
+                                    bool result = enqueue_local(stolen_task.value());
+                                    assert(result);
+                                } else {
+                                    break;
+                                }
+                            }
+                            ++next_victim;
+                            if (next_victim == workers_end)
+                                next_victim = workers_begin;
+                        }
+
+                        if (shutdown_requested_->load(std::memory_order_relaxed) == SOFT_SHUTDOWN
+                            && wsq_->empty() && spscq_->empty())
+                            break;
+                        }
                 }
-                std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_
+                std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_ << std::endl
                     // << ", Local counter: " << local_counter <<  std::endl
                     << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl
-                    << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl
-                    << "[Exit]: Largest: " << largest << std::endl;
+                    << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl;
+                    // << "[Exit]: Largest: " << largest << std::endl;
             });
         }
 
@@ -85,7 +118,7 @@ namespace rts {
         }
 
         // Used by the worker thread to enqueue continuations to its own work-stealing queue.
-        bool enqueue_local(const Task& task) const noexcept {
+        [[nodiscard]] bool enqueue_local(const Task& task) const noexcept {
             assert(task.func);
             return wsq_->try_emplace(task);
         }
