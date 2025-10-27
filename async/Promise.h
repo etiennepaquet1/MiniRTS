@@ -8,7 +8,6 @@
 #include "Worker.h"
 
 namespace rts {
-    inline std::atomic<int> direct_counter {};
 }
 namespace rts::async {
 
@@ -42,7 +41,6 @@ namespace rts::async {
                     if (!tls_worker->enqueue_local(cont)) {
                         // No space in WSQ: Execute it directly
                         cont();
-                        ++direct_counter;
                     }
                 }
             }
