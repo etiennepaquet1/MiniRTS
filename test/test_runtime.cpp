@@ -30,17 +30,39 @@ TEST(ThreadPoolTests, InitAndFinalize) {
     }) << "finalize_hard() should not throw.";
 }
 
-
+// TODO: finalize() returns the local counter for each thread ?? or global maybe?
 TEST(ThreadPoolTests, TestWorkStealing){
     pin_to_core(5);
     EXPECT_NO_THROW({
         rts::initialize_runtime<rts::DefaultThreadPool>(2, 1024);
     }) << "initialize_runtime() should not throw.";
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 100; i++) {
         rts::enqueue([]{});
         rts::enqueue([] {
            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        });
+    }
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+}
+
+TEST(ThreadPoolTests, TestWorkStealing2){
+    pin_to_core(5);
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(2, 64);
+    }) << "initialize_runtime() should not throw.";
+
+    int LOOP {1000};
+    std::atomic<int> count {0};
+    for (int i = 0; i < LOOP; i++) {
+        rts::enqueue([&count]{++count;});
+        rts::enqueue([&count] {
+            ++count;
+           std::this_thread::sleep_for(std::chrono::milliseconds(10));
         });
     }
 
@@ -48,6 +70,7 @@ TEST(ThreadPoolTests, TestWorkStealing){
         rts::finalize_soft();
     }) << "finalize_soft() should not throw.";
 
+    EXPECT_EQ(count, 2 * LOOP);
 }
 
 

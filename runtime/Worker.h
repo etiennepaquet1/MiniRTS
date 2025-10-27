@@ -44,6 +44,7 @@ namespace rts {
             return wsq_->steal();
         }
 
+        // TODO: function too long
         void run() noexcept { // TODO: remove work-stealing on single worker
             thread_ = std::thread([this] {
                 // size_t largest {0};
@@ -53,8 +54,8 @@ namespace rts {
                 pin_to_core(core_affinity_);
 
                 // Pointers to facilitate stealing from other workers
-                Worker* workers_begin {workers_vector_.get()->data()};
-                Worker* workers_end {workers_begin + workers_vector_.get()->size()};
+                Worker* workers_begin {workers_vector_->data()};
+                Worker* workers_end {workers_begin + workers_vector_->size()};
                 Worker* next_victim {workers_begin};
 
                 // std::atomic<long> local_counter {0};
@@ -71,32 +72,36 @@ namespace rts {
                     std::optional<Task> t = wsq_->pop();
                     if (t.has_value()) {
                         assert(t.value().func);
+                        std::osyncstream(std::cout) << core_affinity_ << std::endl;
                         t.value().func();
                         // ++local_counter;
                     } else {
                         // If wsq_ still empty try stealing from another queue.
-                        if (next_victim != this) {
-                            auto victim_queue_size = next_victim->wsq_size();
-                            // Steal half their queue.
-                            for (int i = 0; i < victim_queue_size/2; i++) {
-                                auto stolen_task = next_victim->steal();
-                                if (stolen_task.has_value()) {
-                                    // TODO: remove temp
-                                    bool result = enqueue_local(stolen_task.value());
-                                    assert(result);
-                                } else {
-                                    break;
-                                }
-                            }
+                        do {
                             ++next_victim;
                             if (next_victim == workers_end)
                                 next_victim = workers_begin;
-                        }
+                        } while (next_victim == this);
 
-                        if (shutdown_requested_->load(std::memory_order_relaxed) == SOFT_SHUTDOWN
-                            && wsq_->empty() && spscq_->empty())
-                            break;
+                        auto victim_queue_size = next_victim->wsq_size();
+                        // Steal half their queue.
+                        for (int i = 0; i < victim_queue_size/2; i++) {
+                            auto stolen_task = next_victim->steal();
+                            if (stolen_task.has_value()) {
+                                // TODO: remove temp
+                                bool result = enqueue_local(stolen_task.value());
+                                assert(result);
+                                std::osyncstream(std::cout) << "Worker " <<
+                                    core_affinity_ << " Stole from " <<
+                                        "Worker " << next_victim->core_affinity_ << std::endl;
+                            } else {
+                                break;
+                            }
                         }
+                        if (shutdown_requested_->load(std::memory_order_relaxed) == SOFT_SHUTDOWN
+                        && wsq_->empty() && spscq_->empty())
+                            break;
+                    }
                 }
                 std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_ << std::endl
                     // << ", Local counter: " << local_counter <<  std::endl

@@ -26,7 +26,8 @@ namespace rts {
                 num_threads_(num_threads),
                 stop_flag_(std::make_shared<std::atomic<int> >(0)),
                 round_robin_{0},
-                queue_capacity_(queue_capacity) {}
+                queue_capacity_(queue_capacity),
+                workers_(std::make_shared<std::vector<Worker>>()) {}
 
         ~DefaultThreadPool() noexcept {
             stop_flag_->store(HARD_SHUTDOWN, std::memory_order_release);
