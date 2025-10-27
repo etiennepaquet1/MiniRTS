@@ -3,6 +3,8 @@
 #include <arpa/inet.h>
 #include <sched.h>
 #include <iostream>
+#include <cmath>
+#include <immintrin.h>   // _mm_pause()
 
 #include "Constants.h"
 
@@ -23,5 +25,17 @@ inline void debug_print(const char* msg) {
     {    std::osyncstream(std::cout) << "[Thread ID: "
             << std::this_thread::get_id() << "]: "
                 << msg << std::endl;
+    }
+}
+
+inline void apply_backpressure(double saturation) noexcept {
+    if (saturation < 0.5) return;
+
+    double factor = std::pow(saturation, 4.0);
+    int spin_count = static_cast<int>(factor * 50'000);
+
+    // -------- spin phase
+    for (int i = 0; i < spin_count; ++i) {
+        _mm_pause();
     }
 }

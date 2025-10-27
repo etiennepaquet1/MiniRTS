@@ -12,10 +12,9 @@ namespace rts {
                                   size_t queue_capacity, const Task &task,
                                   ShutdownMode shutdown_mode)
     {
-        { t.workers_ };
         { T(num_threads, queue_capacity) } noexcept;
-        { t.init() } noexcept;
-        { t.finalize(shutdown_mode) } noexcept;
-        { t.enqueue(task) } noexcept;
+        { t.init() } noexcept -> std::same_as<void>;
+        { t.finalize(shutdown_mode) } noexcept -> std::same_as<void>;
+        { t.enqueue(task) } noexcept -> std::same_as<void>;
     };
 }

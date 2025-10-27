@@ -32,6 +32,10 @@ namespace rts {
                                                  shutdown_requested_(stop_flag),
                                                  core_affinity_(core_affinity) {}
 
+        size_t wsq_size() const {
+            return wsq_->size();
+        }
+
         void run() noexcept {
             thread_ = std::thread([this] {
                 size_t largest {0};

@@ -8,6 +8,7 @@
 #include "Worker.h"
 
 namespace rts {
+    inline std::atomic<int> direct_counter {};
 }
 namespace rts::async {
 
@@ -38,9 +39,11 @@ namespace rts::async {
                 state_->ready.store(true, std::memory_order_release);
                 for (auto& cont : state_->continuations) {
                     assert(tls_worker);
-                    if (!tls_worker->enqueue_local(std::move(cont)))
-                        // Right where we started
-                        rts::enqueue(std::move(cont));
+                    if (!tls_worker->enqueue_local(cont)) {
+                        // No space in WSQ: Execute it directly
+                        cont();
+                        ++direct_counter;
+                    }
                 }
             }
         }

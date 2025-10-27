@@ -17,7 +17,6 @@ namespace rts::async {
 
 namespace rts {
 
-    class Worker;
     class DefaultThreadPool;
 
     inline static std::atomic<bool> running{false};
@@ -28,18 +27,16 @@ namespace rts {
     inline static void (*finalize_fn)(ShutdownMode mode) = nullptr;
 
     // Represents how saturated the worker queues are
-    inline float saturation = 0;
+    inline float saturation_cached = 0;
     // Worker queue capacity (Used for calculating saturation)
-    inline unsigned wkr_queue_capacity = 0;
 
     template <ThreadPool T> // TODO: try to find a way to make default thread pool parameter
-    bool initialize_runtime(unsigned num_threads = std::thread::hardware_concurrency(),
-                            unsigned queue_capacity = kDefaultCapacity) noexcept {
+    bool initialize_runtime(size_t num_threads = std::thread::hardware_concurrency(),
+                            size_t queue_capacity = kDefaultCapacity) noexcept {
         bool expected = false;
         if (running.compare_exchange_strong(expected, true,
                                             std::memory_order_release,
                                             std::memory_order_relaxed)) {
-            wkr_queue_capacity = queue_capacity;
             auto* pool = new T(num_threads, queue_capacity);
             pool->init();
 
@@ -71,15 +68,6 @@ namespace rts {
     }
     inline void finalize_soft() noexcept {
         finalize_fn(SOFT_SHUTDOWN);
-    }
-
-    template <ThreadPool T>
-    void compute_saturation() noexcept {
-        int num_wkrs {0};
-        double sum {0};
-        for (Worker& wkr : static_cast<T*>(active_thread_pool)->workers_) {
-            // nope . need to do it locally inside worker public member funcion
-        }
     }
 
     template<typename F, typename... Args>
