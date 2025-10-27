@@ -30,26 +30,6 @@ TEST(ThreadPoolTests, InitAndFinalize) {
 }
 
 
-// TEST(ThreadPoolTests, test_then) {
-//     pin_to_core(5);
-//     constexpr int LOOP = 1000000;
-//
-//
-//     EXPECT_NO_THROW({
-//         rts::initialize_runtime<rts::DefaultThreadPool>(1, 1024);
-//     }) << "initialize_runtime() should not throw.";
-//
-//     for (int i = 0; i < LOOP; i++)
-//     {
-//         auto fut = rts::enqueue_async([] {});
-//         fut.then([] {});
-//     }
-//
-//     EXPECT_NO_THROW({
-//         rts::finalize_soft();
-//     }) << "finalize() should not throw.";
-// }
-
 TEST(ThreadPoolTests, test_multiple_then) {
     pin_to_core(5);
     constexpr int LOOP = 10000;
@@ -164,7 +144,6 @@ INSTANTIATE_TEST_SUITE_P(
            << "_Loop" << info.param.loop_count;
         return os.str();
     });
-
 
 
 class ThenParamTests : public ::testing::TestWithParam<EnqueueParams> {};
