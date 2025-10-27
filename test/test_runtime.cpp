@@ -227,3 +227,44 @@ INSTANTIATE_TEST_SUITE_P(
            << "_Loop" << info.param.loop_count;
         return os.str();
     });
+
+class RecursiveThenTests : public ::testing::TestWithParam<EnqueueParams> {};
+TEST_P(RecursiveThenTests, MultipleThenStress) {
+    const auto& p = GetParam();
+    pin_to_core(5);
+
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+    }) << "initialize_runtime() should not throw.";
+
+    std::atomic<int> counter{0};
+    for (size_t i = 0; i < p.loop_count; ++i) {
+        auto f1 = rts::enqueue_async([&counter] { ++counter; });
+        auto f2 = f1.then([&counter] { ++counter; });
+        auto f3 = f1.then([&counter] { ++counter; });
+        auto f4 = f3.then([&counter] { ++counter; });
+        auto f5 = f3.then([&counter] { ++counter; });
+        auto f6 = f5.then([&counter] { ++counter; });
+        auto f7 = f5.then([&counter] { ++counter; });
+        auto f8 = f7.then([&counter] { ++counter; });
+        auto f9 = f7.then([&counter] { ++counter; });
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+
+    ASSERT_EQ(counter.load(), static_cast<int>(p.loop_count * 9));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    RecursiveThenTests,
+    RecursiveThenTests,
+    ::testing::ValuesIn(GenerateParams()),
+    [](const testing::TestParamInfo<EnqueueParams>& info) {
+        std::ostringstream os;
+        os << "Cores" << info.param.num_threads
+           << "_Cap" << info.param.queue_capacity
+           << "_Loop" << info.param.loop_count;
+        return os.str();
+    });
