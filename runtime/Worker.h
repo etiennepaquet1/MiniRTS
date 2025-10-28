@@ -71,14 +71,15 @@ namespace rts {
                     if (wsq_->empty()) {
                         // Transfer as many items from spscq_ as possible.
                         while (!spscq_->empty() && wsq_->size() != wsq_->capacity()) {
-                            wsq_->emplace(*spscq_->front());
+                            wsq_->emplace(std::move(*spscq_->front()));
                             spscq_->pop();
                         }
                     }
                     std::optional<Task> t = wsq_->pop();
                     if (t.has_value()) {
-                        assert(t.value().func);
-                        t.value().func();
+                        assert(t.value());
+                        t.value()();
+                        t.value().destroy();
                         // std::osyncstream(std::cout) << "Core " << core_affinity_ << std::endl;
                     } else if (enable_work_stealing) {
                         // If wsq_ still empty try stealing from another queue.
@@ -130,14 +131,14 @@ namespace rts {
         }
 
         // Used by the submission thread to enqueue into the worker's SPSC queue.
-        void enqueue(const Task& task) const noexcept {
-            assert(task.func);
-            spscq_->push(task);
+        void enqueue(Task&& task) const noexcept {
+            assert(task);
+            spscq_->emplace(std::move(task));
         }
 
         // Used by the worker thread to enqueue continuations to its own work-stealing queue.
         [[nodiscard]] bool enqueue_local(const Task& task) const noexcept {
-            assert(task.func);
+            assert(task);
             return wsq_->try_emplace(task);
         }
     };
