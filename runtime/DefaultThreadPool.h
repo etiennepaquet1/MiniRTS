@@ -13,9 +13,12 @@ namespace rts {
 
     class DefaultThreadPool {
 
-        std::vector<Worker> workers_;
+        std::shared_ptr<std::vector<Worker>> workers_;
         size_t num_threads_;
         std::shared_ptr<std::atomic<int>> stop_flag_;
+
+        // Used to synchronize soft shutdown.
+        std::shared_ptr<std::atomic<int>> active_workers_;
         int round_robin_;
         size_t queue_capacity_;
 
@@ -26,41 +29,45 @@ namespace rts {
                 num_threads_(num_threads),
                 stop_flag_(std::make_shared<std::atomic<int> >(0)),
                 round_robin_{0},
-                queue_capacity_(queue_capacity) {}
+                queue_capacity_(queue_capacity),
+                workers_(std::make_shared<std::vector<Worker>>()),
+                active_workers_(std::make_shared<std::atomic<int>>(0)) {}
 
         ~DefaultThreadPool() noexcept {
             stop_flag_->store(HARD_SHUTDOWN, std::memory_order_release);
-            for (auto& worker : workers_) {
+            for (auto& worker : *workers_) {
                 worker.join();
             }
         }
 
         void init() noexcept {
-            workers_.reserve(num_threads_);
+            workers_->reserve(num_threads_);
             for (int i = 0; i < num_threads_; i++) {
-                workers_.emplace_back(i, stop_flag_, queue_capacity_);
-                workers_.back().run();
+                workers_->emplace_back(i, stop_flag_, queue_capacity_, workers_, active_workers_);
+            }
+            for (int i = 0; i < num_threads_; i++) {
+                (*workers_)[i].run(num_threads_);
             }
         }
 
         void finalize(ShutdownMode mode) noexcept {
             stop_flag_->store(mode, std::memory_order_release);
-            for (auto& worker : workers_) {
+            for (auto& worker : *workers_) {
                 worker.join();
             }
         }
 
         double compute_saturation() {
-            int sum {0};
-            for (Worker& wkr : workers_) {
+            size_t sum {0};
+            for (Worker& wkr : *workers_) {
                 sum += wkr.wsq_size();
             }
-            return sum / (workers_.size() * num_threads_);
+            return sum / (workers_->size() * num_threads_);
         }
 
-        void enqueue(const Task& task) noexcept {
-            assert(task.func);
-            workers_[round_robin_].enqueue(task);
+        void enqueue(Task &&task) noexcept {
+            assert(task);
+            (*workers_)[round_robin_].enqueue(std::move(task));
             round_robin_++;
             if (round_robin_ == num_threads_)
                 round_robin_ = 0;

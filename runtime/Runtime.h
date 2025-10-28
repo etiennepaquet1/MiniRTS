@@ -23,7 +23,7 @@ namespace rts {
     inline static void* active_thread_pool = nullptr;
 
     // Function pointer to enqueue() implementation.
-    inline static void (*enqueue_fn)(const Task&) = nullptr;
+    inline static void (*enqueue_fn)(Task &&) = nullptr;
     inline static void (*finalize_fn)(ShutdownMode mode) = nullptr;
 
     // Represents how saturated the worker queues are
@@ -41,9 +41,9 @@ namespace rts {
             pool->init();
 
             active_thread_pool = pool;
-            enqueue_fn = [](const Task& task) noexcept {
-                assert(task.func);
-                static_cast<T*>(active_thread_pool)->enqueue(task);
+            enqueue_fn = [](Task &&task) noexcept {
+                assert(task);
+                static_cast<T*>(active_thread_pool)->enqueue(std::move(task));
             };
             finalize_fn = [](ShutdownMode mode) noexcept {
                 auto* p = static_cast<T*>(active_thread_pool);
@@ -58,9 +58,9 @@ namespace rts {
         return false;
     }
 
-    inline void enqueue(const Task& task) noexcept {
-        assert(task.func);
-        enqueue_fn(task);
+    inline void enqueue(Task &&task) noexcept {
+        assert(task);
+        enqueue_fn(std::move(task));
     }
 
     inline void finalize_hard() noexcept {
@@ -93,7 +93,7 @@ namespace rts {
                 p.set_exception(std::current_exception());
             }
         };
-        enqueue(task);
+        enqueue(std::move(task));
         return fut;
     }
 

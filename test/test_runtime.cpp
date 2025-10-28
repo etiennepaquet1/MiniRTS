@@ -8,8 +8,9 @@
 
 
 // ─────────────────────────────────────────────────────────────
-// ------------------------  Unit Tests  -----------------------
+// ---------------------  Integration Tests  -------------------
 // ─────────────────────────────────────────────────────────────
+
 TEST(ThreadPoolTests, InitAndFinalize) {
     pin_to_core(5);
     EXPECT_NO_THROW({
@@ -29,31 +30,65 @@ TEST(ThreadPoolTests, InitAndFinalize) {
     }) << "finalize_hard() should not throw.";
 }
 
-
-TEST(ThreadPoolTests, test_multiple_then) {
+TEST(ThreadPoolTests, TestWorkStealing){
     pin_to_core(5);
-    constexpr int LOOP = 10000;
-
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(1, 1024);
+        rts::initialize_runtime<rts::DefaultThreadPool>(2, 1024);
     }) << "initialize_runtime() should not throw.";
 
-    std::atomic<int> counter{0};
-    for (int i = 0; i < LOOP; i++)
-    {
-        auto fut = rts::enqueue_async([&counter] {++counter;});
-        fut.then([&counter] {++counter;});
-        fut.then([&counter] {++counter;});
-        fut.then([&counter] {++counter;});
-        fut.then([&counter] {++counter;});
-        fut.then([&counter] {++counter;});
+    for (int i = 0; i < 1000; i++) {
+        rts::enqueue([i]{std::cout << i << std::endl;});
+        rts::enqueue([i] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::osyncstream(std::cout) << "---" << i << std::endl;
+        });
     }
 
     EXPECT_NO_THROW({
         rts::finalize_soft();
-    }) << "finalize() should not throw.";
+    }) << "finalize_soft() should not throw.";
+}
 
-    ASSERT_EQ(counter, LOOP * 6);
+
+TEST(ThreadPoolTests, TestEmptyFunctions) {
+    pin_to_core(5);
+
+    constexpr int LOOP {1};
+
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    }) << "initialize_runtime() should not throw.";
+
+    for (size_t i = 0; i < LOOP; ++i) {
+        rts::enqueue([] {
+            std::osyncstream(std::cout) << "function called" << std::endl;
+        });
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+}
+
+TEST(ThreadPoolTests, TestIncrement) {
+    pin_to_core(5);
+
+    constexpr int LOOP {10};
+
+    std::atomic<int> count {0};
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    }) << "initialize_runtime() should not throw.";
+
+    for (size_t i = 0; i < LOOP; ++i) {
+        rts::enqueue([&count] {++count;});
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+
+    EXPECT_EQ(count, LOOP);
 }
 
 

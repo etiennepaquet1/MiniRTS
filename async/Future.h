@@ -9,7 +9,7 @@
 #include "Utils.h"
 
 namespace rts {
-    void enqueue(const Task &) noexcept;
+    void enqueue(Task &&) noexcept;
 }
 
 namespace rts::async {

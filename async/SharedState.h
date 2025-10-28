@@ -6,6 +6,8 @@
 #include <vector>
 #include <functional>
 
+#include "Task.h"
+
 namespace rts::async {
 
     template <typename T>
@@ -15,7 +17,7 @@ namespace rts::async {
 
         std::optional<T> value;
         std::exception_ptr exception;
-        std::vector<std::function<void()>> continuations;  // registered callbacks
+        std::vector<Task> continuations;  // registered callbacks
     };
 
     // Same exact concept but remove the "value" member.
@@ -25,7 +27,7 @@ namespace rts::async {
         std::atomic<bool> ready{false};      // fast path for continuations
 
         std::exception_ptr exception;
-        std::vector<std::function<void()>> continuations;  // registered callbacks
+        std::vector<Task> continuations;  // registered callbacks
     };
 
 }
