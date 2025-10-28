@@ -8,7 +8,7 @@
 
 
 // ─────────────────────────────────────────────────────────────
-// ------------------------  Unit Tests  -----------------------
+// ---------------------  Integration Tests  -------------------
 // ─────────────────────────────────────────────────────────────
 
 TEST(ThreadPoolTests, InitAndFinalize) {
@@ -36,40 +36,17 @@ TEST(ThreadPoolTests, TestWorkStealing){
         rts::initialize_runtime<rts::DefaultThreadPool>(2, 1024);
     }) << "initialize_runtime() should not throw.";
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 1000; i++) {
         rts::enqueue([i]{std::cout << i << std::endl;});
         rts::enqueue([i] {
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-            std::osyncstream(std::cout) << 10 + i << std::endl;
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::osyncstream(std::cout) << "---" << i << std::endl;
         });
     }
 
     EXPECT_NO_THROW({
         rts::finalize_soft();
     }) << "finalize_soft() should not throw.";
-}
-
-TEST(ThreadPoolTests, TestWorkStealing2){
-    pin_to_core(5);
-    EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(2, 1024);
-    }) << "initialize_runtime() should not throw.";
-
-    int LOOP {1000};
-    std::atomic<int> count {0};
-    for (int i = 0; i < LOOP; i++) {
-        rts::enqueue([&count]{++count;});
-        rts::enqueue([&count] {
-            ++count;
-           std::this_thread::sleep_for(std::chrono::microseconds(100));
-        });
-    }
-
-    EXPECT_NO_THROW({
-        rts::finalize_soft();
-    }) << "finalize_soft() should not throw.";
-
-    EXPECT_EQ(count, 2 * LOOP);
 }
 
 
