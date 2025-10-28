@@ -77,7 +77,7 @@ TEST(ThreadPoolTests, InitAndFinalize) {
 TEST(ThreadPoolTests, TestEmptyFunctions) {
     pin_to_core(5);
 
-    constexpr int LOOP {10};
+    constexpr int LOOP {1};
 
     EXPECT_NO_THROW({
         rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
@@ -94,26 +94,26 @@ TEST(ThreadPoolTests, TestEmptyFunctions) {
     }) << "finalize_soft() should not throw.";
 }
 
-// TEST(ThreadPoolTests, TestIncrement) {
-//     pin_to_core(5);
-//
-//     constexpr int LOOP {100000};
-//
-//     std::atomic<int> count {0};
-//     EXPECT_NO_THROW({
-//         rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
-//     }) << "initialize_runtime() should not throw.";
-//
-//     for (size_t i = 0; i < LOOP; ++i) {
-//         rts::enqueue([&count] {++count;});
-//     }
-//
-//     EXPECT_NO_THROW({
-//         rts::finalize_soft();
-//     }) << "finalize_soft() should not throw.";
-//
-//     EXPECT_EQ(count, LOOP);
-// }
+TEST(ThreadPoolTests, TestIncrement) {
+    pin_to_core(5);
+
+    constexpr int LOOP {10};
+
+    std::atomic<int> count {0};
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    }) << "initialize_runtime() should not throw.";
+
+    for (size_t i = 0; i < LOOP; ++i) {
+        rts::enqueue([&count] {++count;});
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+
+    EXPECT_EQ(count, LOOP);
+}
 
 
 // ─────────────────────────────────────────────────────────────

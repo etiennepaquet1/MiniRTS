@@ -20,10 +20,18 @@ struct Task {
           invoke_fn(other.invoke_fn),
           destroy_fn(other.destroy_fn)
     {
-        std::osyncstream (std::cout) << "Copy ctor called\n";
+        std::osyncstream (std::cout) << "Copy ctor\n";
     }
     Task& operator=(const Task&) noexcept = default;
-    Task(Task&&) noexcept = default;
+
+    Task(Task&& other) noexcept
+        : callable_ptr(std::exchange(other.callable_ptr, nullptr)),
+          invoke_fn(std::exchange(other.invoke_fn, nullptr)),
+          destroy_fn(std::exchange(other.destroy_fn, nullptr))
+    {
+        std::cout << "Move ctor\n";
+    }
+
     Task& operator=(Task&&) noexcept = default;
 
     // ───────────────────────────────
