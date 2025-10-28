@@ -67,7 +67,7 @@ namespace rts {
 
         void enqueue(const Task& task) noexcept {
             assert(task.func);
-            (*workers_)[round_robin_].enqueue(task);
+            (*workers_)[round_robin_].enqueue(std::move(task));
             round_robin_++;
             if (round_robin_ == num_threads_)
                 round_robin_ = 0;

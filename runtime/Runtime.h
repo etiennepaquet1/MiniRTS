@@ -43,7 +43,7 @@ namespace rts {
             active_thread_pool = pool;
             enqueue_fn = [](const Task& task) noexcept {
                 assert(task.func);
-                static_cast<T*>(active_thread_pool)->enqueue(task);
+                static_cast<T*>(active_thread_pool)->enqueue(std::move(task));
             };
             finalize_fn = [](ShutdownMode mode) noexcept {
                 auto* p = static_cast<T*>(active_thread_pool);
@@ -60,7 +60,7 @@ namespace rts {
 
     inline void enqueue(const Task& task) noexcept {
         assert(task.func);
-        enqueue_fn(task);
+        enqueue_fn(std::move(task));
     }
 
     inline void finalize_hard() noexcept {

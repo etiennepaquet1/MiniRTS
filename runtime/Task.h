@@ -7,7 +7,9 @@ struct Task {
     Task(Task&&) noexcept = default;
     Task& operator=(Task&&) noexcept = default;
 
-    Task(const Task&) = default;
+    Task(const Task& t) : func(t.func) {
+        std::cout << "Copied Task" << std::endl;
+    }
     Task& operator=(const Task&) = default;
 
     template <std::invocable F>

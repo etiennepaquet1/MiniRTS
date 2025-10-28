@@ -71,11 +71,11 @@ namespace rts {
                     if (wsq_->empty()) {
                         // Transfer as many items from spscq_ as possible.
                         while (!spscq_->empty() && wsq_->size() != wsq_->capacity()) {
-                            wsq_->emplace(*spscq_->front());
+                            wsq_->emplace(std::move(*spscq_->front()));
                             spscq_->pop();
                         }
                     }
-                    std::optional<Task> t = wsq_->pop();
+                    std::optional<Task> t = std::move(wsq_->pop());
                     if (t.has_value()) {
                         assert(t.value().func);
                         t.value().func();
@@ -132,7 +132,7 @@ namespace rts {
         // Used by the submission thread to enqueue into the worker's SPSC queue.
         void enqueue(const Task& task) const noexcept {
             assert(task.func);
-            spscq_->push(task);
+            spscq_->push(std::move(task));
         }
 
         // Used by the worker thread to enqueue continuations to its own work-stealing queue.
