@@ -7,7 +7,6 @@ struct Task {
     Task(Task&&) noexcept = default;
     Task& operator=(Task&&) noexcept = default;
 
-    // Task is move-only
     Task(const Task&) = default;
     Task& operator=(const Task&) = default;
 
@@ -16,4 +15,3 @@ struct Task {
 
     std::function<void()> func;
 };
-

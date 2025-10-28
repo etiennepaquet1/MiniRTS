@@ -16,6 +16,9 @@ namespace rts {
         std::shared_ptr<std::vector<Worker>> workers_;
         size_t num_threads_;
         std::shared_ptr<std::atomic<int>> stop_flag_;
+
+        // Used to synchronize soft shutdown.
+        std::shared_ptr<std::atomic<int>> active_workers_;
         int round_robin_;
         size_t queue_capacity_;
 
@@ -27,7 +30,8 @@ namespace rts {
                 stop_flag_(std::make_shared<std::atomic<int> >(0)),
                 round_robin_{0},
                 queue_capacity_(queue_capacity),
-                workers_(std::make_shared<std::vector<Worker>>()) {}
+                workers_(std::make_shared<std::vector<Worker>>()),
+                active_workers_(std::make_shared<std::atomic<int>>(0)) {}
 
         ~DefaultThreadPool() noexcept {
             stop_flag_->store(HARD_SHUTDOWN, std::memory_order_release);
@@ -39,8 +43,10 @@ namespace rts {
         void init() noexcept {
             workers_->reserve(num_threads_);
             for (int i = 0; i < num_threads_; i++) {
-                workers_->emplace_back(i, stop_flag_, queue_capacity_, workers_);
-                workers_->back().run();
+                workers_->emplace_back(i, stop_flag_, queue_capacity_, workers_, active_workers_);
+            }
+            for (int i = 0; i < num_threads_; i++) {
+                (*workers_)[i].run(num_threads_);
             }
         }
 
