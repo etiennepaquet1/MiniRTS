@@ -97,7 +97,7 @@ namespace rts {
                         auto stolen_task = next_victim->steal();
                             if (stolen_task.has_value()) {
                                 // TODO: remove temp
-                                bool result = enqueue_local(stolen_task.value());
+                                bool result = enqueue_local(std::move(stolen_task.value()));
                                 assert(result);
                                 // std::osyncstream(std::cout) << "Worker " <<
                                 //     core_affinity_ << " Stole from " <<
@@ -137,9 +137,9 @@ namespace rts {
         }
 
         // Used by the worker thread to enqueue continuations to its own work-stealing queue.
-        [[nodiscard]] bool enqueue_local(const Task& task) const noexcept {
+        [[nodiscard]] bool enqueue_local(Task &&task) const noexcept {
             assert(task);
-            return wsq_->try_emplace(task);
+            return wsq_->try_emplace(std::move(task));
         }
     };
 }
