@@ -65,8 +65,8 @@ namespace rts {
             return sum / (workers_->size() * num_threads_);
         }
 
-        void enqueue(Task &&task) noexcept {
-            assert(task);
+        void enqueue(const Task& task) noexcept {
+            assert(task.func);
             (*workers_)[round_robin_].enqueue(std::move(task));
             round_robin_++;
             if (round_robin_ == num_threads_)

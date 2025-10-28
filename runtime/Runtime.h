@@ -41,8 +41,8 @@ namespace rts {
             pool->init();
 
             active_thread_pool = pool;
-            enqueue_fn = [](Task &&task) noexcept {
-                assert(task);
+            enqueue_fn = [](const Task& task) noexcept {
+                assert(task.func);
                 static_cast<T*>(active_thread_pool)->enqueue(std::move(task));
             };
             finalize_fn = [](ShutdownMode mode) noexcept {
@@ -58,8 +58,8 @@ namespace rts {
         return false;
     }
 
-    inline void enqueue(Task &&task) noexcept {
-        assert(task);
+    inline void enqueue(const Task& task) noexcept {
+        assert(task.func);
         enqueue_fn(std::move(task));
     }
 

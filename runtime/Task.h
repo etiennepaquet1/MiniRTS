@@ -38,17 +38,10 @@ struct Task {
 
     Task& operator=(Task&&) noexcept = default;
 
-    // ───────────────────────────────
-    // Construct from callable
-    // ───────────────────────────────
-    template <typename F>
-    requires (!std::same_as<std::decay_t<F>, Task>)
-    Task(F&& f) noexcept {
-        using Fn = std::decay_t<F>;
-        callable_ptr = new Fn(std::forward<F>(f));
-        invoke_fn = [](void* p) noexcept { (*static_cast<Fn*>(p))(); };
-        destroy_fn = [](void* p) noexcept { delete static_cast<Fn*>(p); };
+    Task(const Task& t) : func(t.func) {
+        std::cout << "Copied Task" << std::endl;
     }
+    Task& operator=(const Task&) = default;
 
     // ───────────────────────────────
     // Invoke and manual destroy

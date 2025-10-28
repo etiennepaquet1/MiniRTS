@@ -75,7 +75,7 @@ namespace rts {
                             spscq_->pop();
                         }
                     }
-                    std::optional<Task> t = wsq_->pop();
+                    std::optional<Task> t = std::move(wsq_->pop());
                     if (t.has_value()) {
                         assert(t.value());
                         t.value()();
@@ -131,9 +131,9 @@ namespace rts {
         }
 
         // Used by the submission thread to enqueue into the worker's SPSC queue.
-        void enqueue(Task&& task) const noexcept {
-            assert(task);
-            spscq_->emplace(std::move(task));
+        void enqueue(const Task& task) const noexcept {
+            assert(task.func);
+            spscq_->push(std::move(task));
         }
 
         // Used by the worker thread to enqueue continuations to its own work-stealing queue.
