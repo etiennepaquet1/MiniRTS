@@ -3,7 +3,6 @@
 #include <thread>
 #include <vector>
 #include <memory>
-#include <functional>
 
 #include "Constants.h"
 #include "Worker.h"
@@ -50,7 +49,7 @@ namespace rts {
             }
         }
 
-        void finalize(ShutdownMode mode) noexcept {
+        void finalize(ShutdownMode mode) const noexcept {
             stop_flag_->store(mode, std::memory_order_release);
             for (auto& worker : *workers_) {
                 worker.join();

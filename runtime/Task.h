@@ -12,11 +12,10 @@ struct Task {
     InvokeFn    invoke_fn    = nullptr;
     DestroyFn   destroy_fn   = nullptr;
 
-    // ───────────────────────────────
-    // Default operations (trivial)
-    // ───────────────────────────────
     Task() noexcept = default;
 
+
+    // Task is move-only to avoid double-free.
     Task(const Task& other) = delete;
     Task& operator=(const Task&) noexcept = default;
 
@@ -24,9 +23,7 @@ struct Task {
 
     Task& operator=(Task&&) noexcept = default;
 
-    // ───────────────────────────────
-    // Construct from callable
-    // ───────────────────────────────
+    // Construct from callable.
     template <typename F>
     requires (!std::same_as<std::decay_t<F>, Task>)
     Task(F&& f) noexcept {
@@ -36,14 +33,13 @@ struct Task {
         destroy_fn = [](void* p) noexcept { delete static_cast<Fn*>(p); };
     }
 
-    // ───────────────────────────────
-    // Invoke and manual destroy
-    // ───────────────────────────────
+    // Invoke.
     void operator()() const noexcept {
         assert(invoke_fn && callable_ptr);
         invoke_fn(callable_ptr);
     }
 
+    // Manual destroy.
     void destroy() noexcept {
         if (destroy_fn && callable_ptr)
             destroy_fn(callable_ptr);

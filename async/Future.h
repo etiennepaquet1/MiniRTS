@@ -17,7 +17,6 @@ namespace rts::async {
     template <typename T>
     class Promise;
 
-
     template<typename T>
     class Future {
         std::shared_ptr<SharedState<T>> state_;
@@ -71,11 +70,11 @@ namespace rts::async {
                     p.set_exception(std::current_exception());
                 }
             };
-            // if already ready, run immediately
+            // If already ready, run immediately.
             if (is_ready()) {
                 enqueue(std::move(cont));
             } else {
-                // otherwise register continuation
+                // Otherwise, register continuation.
                 {
                     std::lock_guard lk(state_->mtx);
                     state_->continuations.push_back(std::move(cont));
@@ -87,11 +86,9 @@ namespace rts::async {
 
         template<typename F>
         Future<std::invoke_result_t<F>> then(F &&f);
-
-        // template <typename... Fs>
-        // then_all()
     };
 
+    // Specialization for void Futures.
     template <>
     template <typename F>
     Future<std::invoke_result_t<F>> Future<void>::then(F&& f) {

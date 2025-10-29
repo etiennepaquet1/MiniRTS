@@ -7,8 +7,6 @@
 #include "Future.h"
 #include "Worker.h"
 
-namespace rts {
-}
 namespace rts::async {
 
     template<typename T>

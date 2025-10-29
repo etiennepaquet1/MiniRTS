@@ -25,11 +25,12 @@ namespace rts {
 
     // Function pointer to enqueue() implementation.
     inline static void (*enqueue_fn)(Task &&) = nullptr;
+    // Function pointer to finalize() implementation.
     inline static void (*finalize_fn)(ShutdownMode mode) = nullptr;
 
-    // Represents how saturated the worker queues are
+    // Represents how saturated the worker queues are.
     inline float saturation_cached = 0;
-    // Worker queue capacity (Used for calculating saturation)
+
 
     template <ThreadPool T = DefaultThreadPool>
     bool initialize_runtime(size_t num_threads = std::thread::hardware_concurrency(),
@@ -150,7 +151,7 @@ namespace rts {
         return out;
     }
 
-
+// TODO: add specialization to accept future<void> arguments
     // template<typename... Futures>
     // auto when_all(Futures &&... futures) {
     //     using ResultTuple = std::tuple<
