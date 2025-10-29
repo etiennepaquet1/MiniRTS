@@ -16,13 +16,7 @@ struct Task {
     // ───────────────────────────────
     Task() noexcept = default;
 
-    Task(const Task& other) noexcept
-        : callable_ptr(other.callable_ptr),
-          invoke_fn(other.invoke_fn),
-          destroy_fn(other.destroy_fn)
-    {
-        std::osyncstream (std::cout) << "Copy ctor\n";
-    }
+    Task(const Task& other) = delete;
     Task& operator=(const Task&) noexcept = default;
 
 

@@ -42,6 +42,7 @@ namespace rts::async {
                         // No space in WSQ: Execute it directly.
                         assert (cont);
                         cont();
+                        cont.destroy();
                     }
                 }
             }
