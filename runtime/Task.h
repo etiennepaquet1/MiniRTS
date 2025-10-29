@@ -1,4 +1,5 @@
 #pragma once
+
 #include <utility>
 #include <type_traits>
 #include <cassert>
@@ -19,9 +20,7 @@ struct Task {
     Task(const Task& other) = delete;
     Task& operator=(const Task&) noexcept = default;
 
-
     Task(Task&& other) noexcept = default;
-
 
     Task& operator=(Task&&) noexcept = default;
 

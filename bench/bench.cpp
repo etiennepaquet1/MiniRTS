@@ -32,9 +32,7 @@ static void BM_Async_Latency_1_000_000(benchmark::State &state) {
             rts::enqueue_async([]{});
         }
 
-        state.PauseTiming();
         rts::finalize_soft();
-        state.ResumeTiming();
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::nano> elapsed = end - start;

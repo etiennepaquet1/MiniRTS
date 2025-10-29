@@ -16,6 +16,8 @@ namespace rts::async {
         std::shared_ptr<SharedState<T>> state_;
 
     public:
+        using value_type = T;
+
         Promise() noexcept : state_(std::make_shared<SharedState<T>>()) {}
 
         Future<T> get_future() noexcept { return Future<T>(state_); }
@@ -27,8 +29,15 @@ namespace rts::async {
                 state_->value = std::move(value);
                 state_->ready.store(true, std::memory_order_release);
             }
-            for (auto& cont : state_->continuations)
-                rts::enqueue(std::move(cont));
+            for (auto& cont : state_->continuations) {
+                assert(tls_worker);
+                if (!tls_worker->enqueue_local(std::move(cont))) {
+                    // No space in WSQ: Execute it directly.
+                    assert(cont);
+                    cont();
+                    cont.destroy();
+                }
+            }
         }
 
         template<typename U = T>

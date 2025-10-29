@@ -53,6 +53,7 @@ namespace rts {
             active_workers_->fetch_add(1, std::memory_order_release);
 
             thread_ = std::thread([this, num_threads] {
+                pin_to_core(core_affinity_);
 
                 bool active = true;
 
@@ -60,7 +61,6 @@ namespace rts {
                 bool enable_work_stealing = (num_threads >= 2);
 
                 tls_worker = this;
-                pin_to_core(core_affinity_);
 
                 // Pointers to facilitate stealing from other workers
                 Worker* workers_begin {workers_vector_->data()};
@@ -80,7 +80,6 @@ namespace rts {
                         assert(t.value());
                         t.value()();
                         t.value().destroy();
-                        // std::osyncstream(std::cout) << "Core " << core_affinity_ << std::endl;
                     } else if (enable_work_stealing) {
                         // If wsq_ still empty try stealing from another queue.
                         do {
@@ -99,9 +98,6 @@ namespace rts {
                                 // TODO: remove temp
                                 bool result = enqueue_local(std::move(stolen_task.value()));
                                 assert(result);
-                                // std::osyncstream(std::cout) << "Worker " <<
-                                //     core_affinity_ << " Stole from " <<
-                                //         "Worker " << next_victim->core_affinity_ << std::endl;
                             } else {
                                 break;
                             }

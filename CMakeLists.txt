@@ -43,6 +43,8 @@ if(BUILD_TESTS)
 
     add_executable(MiniRTS_tests
             test/test_runtime.cpp
+            test/test_future.cpp
+            test/test_when_all.cpp
     )
 
     target_link_libraries(MiniRTS_tests
@@ -71,6 +73,7 @@ if(BUILD_BENCHMARKS)
 
     add_executable(MiniRTS_bench
             bench/bench.cpp
+            a.cpp
     )
 
     target_link_libraries(MiniRTS_bench
