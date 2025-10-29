@@ -22,13 +22,6 @@ struct Task {
 
     Task(Task&& other) noexcept = default;
 
-    // Task(Task&& other) noexcept
-    //     : callable_ptr(std::exchange(other.callable_ptr, nullptr)),
-    //       invoke_fn(std::exchange(other.invoke_fn, nullptr)),
-    //       destroy_fn(std::exchange(other.destroy_fn, nullptr))
-    // {
-    //     std::cout << "Move ctor\n";
-    // }
 
     Task& operator=(Task&&) noexcept = default;
 

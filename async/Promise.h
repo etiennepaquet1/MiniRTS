@@ -36,14 +36,14 @@ namespace rts::async {
             {
                 std::lock_guard lk(state_->mtx);
                 state_->ready.store(true, std::memory_order_release);
-                for (Task& cont : state_->continuations) {
-                    assert(tls_worker);
-                    if (!tls_worker->enqueue_local(std::move(cont))) {
-                        // No space in WSQ: Execute it directly.
-                        assert (cont);
-                        cont();
-                        cont.destroy();
-                    }
+            }
+            for (Task& cont : state_->continuations) {
+                assert(tls_worker);
+                if (!tls_worker->enqueue_local(std::move(cont))) {
+                    // No space in WSQ: Execute it directly.
+                    assert (cont);
+                    cont();
+                    cont.destroy();
                 }
             }
         }
