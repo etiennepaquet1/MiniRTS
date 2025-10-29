@@ -1,8 +1,8 @@
 #pragma once
 
-#include <utility>
-#include <type_traits>
 #include <cassert>
+#include <type_traits>
+#include <utility>
 
 struct Task {
     using InvokeFn  = void(*)(void*) noexcept;

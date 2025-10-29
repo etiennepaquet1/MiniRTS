@@ -60,16 +60,16 @@ namespace rts {
         return false;
     }
 
-    inline void enqueue(Task &&task) noexcept {
-        assert(task);
-        enqueue_fn(std::move(task));
-    }
-
     inline void finalize_hard() noexcept {
         finalize_fn(HARD_SHUTDOWN);
     }
     inline void finalize_soft() noexcept {
         finalize_fn(SOFT_SHUTDOWN);
+    }
+
+    inline void enqueue(Task &&task) noexcept {
+        assert(task);
+        enqueue_fn(std::move(task));
     }
 
     template<typename F, typename... Args>

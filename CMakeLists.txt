@@ -14,10 +14,12 @@ include(FetchContent)
 # ─────────────────────────────────────────────
 # Core library
 # ─────────────────────────────────────────────
-add_library(Runtime INTERFACE)
+add_library(Runtime
+        runtime/Worker.cpp
+)
 
 target_include_directories(Runtime
-        INTERFACE
+        PUBLIC
         ${CMAKE_SOURCE_DIR}/runtime
         ${CMAKE_SOURCE_DIR}/async
         ${CMAKE_SOURCE_DIR}/external
@@ -74,6 +76,7 @@ if(BUILD_BENCHMARKS)
     add_executable(MiniRTS_bench
             bench/bench.cpp
             a.cpp
+            runtime/Worker.cpp
     )
 
     target_link_libraries(MiniRTS_bench
