@@ -1,5 +1,5 @@
 /**
- * @file Task.h
+ * @file task.h
  * @brief Defines the Task type — a small, move-only, type-erased callable wrapper
  *        used by the RTS scheduler to represent units of executable work.
  *
