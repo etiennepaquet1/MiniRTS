@@ -73,14 +73,17 @@ namespace rts::async {
                     p.set_exception(std::current_exception());
                 }
             };
-            // If already ready, run immediately.
-            if (is_ready()) {
-                enqueue(std::move(cont));
-            } else {
-                // Otherwise, register continuation.
-                {
-                    std::lock_guard lk(state_->mtx);
-                    state_->continuations.push_back(std::move(cont));
+
+            {
+                std::lock_guard lk(state_->mtx);
+                // If already ready, run immediately.
+                if (is_ready()) {
+                    enqueue(std::move(cont));
+                } else {
+                    // Otherwise, register continuation.
+                    {
+                        state_->continuations.push_back(std::move(cont));
+                    }
                 }
             }
             return fut_next;

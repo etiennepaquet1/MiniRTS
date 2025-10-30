@@ -109,7 +109,7 @@ TEST(ThreadPoolTests, TestLongChain) {
     rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
 
     std::atomic<int> ct {0};
-    constexpr int N = 10'000;
+    constexpr int N = 1'000'000;
     auto fut = rts::enqueue_async([&ct] { ++ct; return 1; });
     for (int i = 0; i < N; ++i) {
         fut = fut.then([&ct](int x) { ++ct; return x + 1; });
