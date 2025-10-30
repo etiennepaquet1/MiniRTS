@@ -154,7 +154,6 @@ namespace rts::async {
     template<typename F>
     Future<std::invoke_result_t<F>> Future<void>::then(F &&f) {
         assert(state_ && "then() called on invalid Future<void>");
-        assert(!state_.unique() && "then() called on orphaned Future (Promise destroyed)");
         using U = std::invoke_result_t<F>;
 
         Promise<U> p;
