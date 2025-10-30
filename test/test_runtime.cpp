@@ -32,25 +32,25 @@ TEST(ThreadPoolTests, InitAndFinalize) {
 
 
 
-// TEST(ThreadPoolTests, TestEmptyFunctions) {
-//     pin_to_core(5);
-//
-//     constexpr int LOOP {1};
-//
-//     EXPECT_NO_THROW({
-//         rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
-//     }) << "initialize_runtime() should not throw.";
-//
-//     for (size_t i = 0; i < LOOP; ++i) {
-//         rts::enqueue([] {
-//             std::osyncstream(std::cout) << "function called" << std::endl;
-//         });
-//     }
-//
-//     EXPECT_NO_THROW({
-//         rts::finalize_soft();
-//     }) << "finalize_soft() should not throw.";
-// }
+TEST(ThreadPoolTests, TestEmptyFunctions) {
+    pin_to_core(5);
+
+    constexpr int LOOP {1'000'000};
+
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    }) << "initialize_runtime() should not throw.";
+
+    for (size_t i = 0; i < LOOP; ++i) {
+        rts::enqueue([] {
+
+        });
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+}
 
 // TEST(ThreadPoolTests, TestIncrement) {
 //     pin_to_core(5);

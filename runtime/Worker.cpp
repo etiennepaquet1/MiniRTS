@@ -67,8 +67,11 @@ void rts::Worker::run(size_t num_threads) noexcept {
                     break;
             }
         }
-        std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_ << std::endl
-            << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl
-            << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl;
+        if constexpr (DEBUG) {
+            std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_ << std::endl
+               << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl
+               << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl;
+        }
     });
 }
+
