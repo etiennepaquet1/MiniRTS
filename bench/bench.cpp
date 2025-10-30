@@ -95,7 +95,7 @@ static void BM_Enqueue_Overhead_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
     if (!is_tsc_invariant())
-        state.SkipWithError("reason");
+        state.SkipWithError("Invariant TSC required");
 
     constexpr int LOOP = 1'000'000;
     constexpr int TARGET_NS = 1000;
@@ -258,7 +258,7 @@ static void BM_Async_Overhead_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
     if (!is_tsc_invariant())
-        state.SkipWithError("reason");
+        state.SkipWithError("Invariant TSC required");
 
     constexpr int LOOP = 1'000'000;
     constexpr int TARGET_NS = 1000;

@@ -64,23 +64,36 @@ if(BUILD_TESTS)
     gtest_discover_tests(MiniRTS_tests)
 endif()
 
+
 # ─────────────────────────────────────────────
 # Google Benchmark
 # ─────────────────────────────────────────────
 option(BUILD_BENCHMARKS "Build performance benchmarks" ON)
 
 if(BUILD_BENCHMARKS)
+    # Download Google Benchmark
     FetchContent_Declare(
             benchmark
             URL https://github.com/google/benchmark/archive/refs/tags/v1.9.0.zip
             DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(benchmark)
 
+    # Force benchmark to build in Release mode, even if the main project is Debug
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_LTO ON CACHE BOOL "" FORCE)
+    set(CMAKE_BUILD_TYPE_BENCHMARK Release CACHE STRING "Build type for benchmark" FORCE)
+
+    # Trick: temporarily override the build type for this subproject only
+    set(_OLD_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+    set(CMAKE_BUILD_TYPE Release)
+    FetchContent_MakeAvailable(benchmark)
+    set(CMAKE_BUILD_TYPE ${_OLD_BUILD_TYPE})
+
+    # Now build your benchmark executable
     add_executable(MiniRTS_bench
             bench/bench.cpp
     )
+
     target_include_directories(MiniRTS_bench
             PRIVATE
             ${CMAKE_SOURCE_DIR}/bench
@@ -92,5 +105,4 @@ if(BUILD_BENCHMARKS)
             Runtime
             Bench
     )
-
 endif()

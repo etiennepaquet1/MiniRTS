@@ -24,7 +24,7 @@
  * A Task is the basic executable unit within the RTS. It holds a pointer
  * to a heap-allocated callable and the function pointers needed to
  * invoke and destroy it safely. It is intended to be passed around
- * thread-safe queues (SPSC, MPMC, etc.) and executed asynchronously.
+ * thread-safe queues and executed asynchronously.
  */
 struct Task {
     /// @brief Function pointer type for invoking the stored callable.

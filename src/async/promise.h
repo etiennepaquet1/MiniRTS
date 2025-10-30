@@ -49,10 +49,6 @@ namespace rts::async {
             assert(state_ && "Promise must have valid SharedState");
         }
 
-        /**
-         * @brief Disable copy semantics — promises cannot be safely duplicated.
-         */
-
         Promise(Promise&& other) noexcept
             : state_(std::move(other.state_)) {}
 
@@ -63,8 +59,8 @@ namespace rts::async {
             return *this;
         }
 
-        Promise(const Promise&) = delete;
-        Promise& operator=(const Promise&) = delete;
+        Promise(const Promise&) = default;
+        Promise& operator=(const Promise&) = default;
 
         /**
          * @brief Retrieves the associated Future.

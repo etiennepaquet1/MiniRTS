@@ -1,6 +1,6 @@
 /**
-* @file Constants.h
- * @brief Core configuration constants and shutdown modes for the MiniRTS runtime.
+* @file constants.h
+ * @brief Configuration constants and shutdown modes for the MiniRTS runtime.
  *
  * This header defines cache-line alignment constants, default queue capacities,
  * debug flags, and shutdown mode options shared across the runtime system.
