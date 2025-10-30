@@ -223,6 +223,46 @@ INSTANTIATE_TEST_SUITE_P(
         return os.str();
     });
 
+class IntegerThenTests : public ::testing::TestWithParam<EnqueueParams> {};
+
+TEST_P(IntegerThenTests, ContinuationStress) {
+    const auto& p = GetParam();
+    pin_to_core(5);
+
+
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+    }) << "initialize_runtime() should not throw.";
+
+    for (size_t i = 0; i < p.loop_count; ++i) {
+        auto f1 = rts::enqueue_async([i] {return i;});
+        auto f2 = f1.then([](std::tuple<int> t) { return std::get<0>(t); });
+        EXPECT_EQ(f2.get(), i);
+    }
+
+    std::cout << "[Cores " << p.num_threads
+              << " | Cap " << p.queue_capacity
+              << " | Loop " << p.loop_count
+              << "]" << std::endl;
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+}
+
+// Instantiate the parameter combinations
+INSTANTIATE_TEST_SUITE_P(
+    ThreadPoolThenTests,
+    IntegerThenTests,
+    ::testing::ValuesIn(GenerateParams()),
+    [](const testing::TestParamInfo<EnqueueParams>& info) {
+        std::ostringstream os;
+        os << "Cores" << info.param.num_threads
+           << "_Cap" << info.param.queue_capacity
+           << "_Loop" << info.param.loop_count;
+        return os.str();
+    });
+
 
 class MultipleThenTests : public ::testing::TestWithParam<EnqueueParams> {};
 TEST_P(MultipleThenTests, MultipleThenStress) {
