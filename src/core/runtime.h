@@ -18,9 +18,9 @@
 #include <utility>
 #include <vector>
 
-#include "Task.h"
-#include "ThreadPool.h"
-#include "Constants.h"
+#include "task.h"
+#include "thread_pool.h"
+#include "constants.h"
 
 namespace rts::async {
     template <typename T>

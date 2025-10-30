@@ -6,7 +6,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "Constants.h"
+#include "constants.h"
 
 inline void pin_to_core(size_t core_id) {
     cpu_set_t cpuset;

@@ -1,5 +1,5 @@
 /**
- * @file Future.h
+ * @file future.h
  * @brief The future type for all tasks.
  */
 
@@ -12,9 +12,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "SharedState.h"
-#include "Task.h"
-#include "Utils.h"
+#include "shared_state.h"
+#include "task.h"
+#include "utils.h"
 
 namespace rts {
     /**

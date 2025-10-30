@@ -15,13 +15,13 @@ include(FetchContent)
 # Core library
 # ─────────────────────────────────────────────
 add_library(Runtime
-        runtime/Worker.cpp
+        src/core/worker.cpp
 )
 
 target_include_directories(Runtime
         PUBLIC
-        ${CMAKE_SOURCE_DIR}/runtime
-        ${CMAKE_SOURCE_DIR}/async
+        ${CMAKE_SOURCE_DIR}/src/core
+        ${CMAKE_SOURCE_DIR}/src/async
         ${CMAKE_SOURCE_DIR}/external
         ${CMAKE_SOURCE_DIR}/external/WorkStealingQueue/include
         ${CMAKE_SOURCE_DIR}/external/MPMCQueue/include

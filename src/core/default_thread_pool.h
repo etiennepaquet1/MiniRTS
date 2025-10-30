@@ -20,11 +20,11 @@
 #include <vector>
 #include <syncstream>
 
-#include "Constants.h"
-#include "Task.h"
-#include "ThreadPool.h"
-#include "Worker.h"
-#include "Utils.h"
+#include "constants.h"
+#include "task.h"
+#include "thread_pool.h"
+#include "worker.h"
+#include "utils.h"
 
 namespace rts {
 

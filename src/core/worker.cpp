@@ -1,4 +1,4 @@
-#include "Worker.h"
+#include "worker.h"
 
 void rts::Worker::run(size_t num_threads) noexcept {
     active_workers_->fetch_add(1, std::memory_order_release);
