@@ -31,10 +31,11 @@ TEST(ThreadPoolTests, InitAndFinalize) {
 }
 
 
-TEST(ThreadPoolTests, TestReturnValue) {
+
+TEST(ThreadPoolTests, TestEmptyFunctions) {
     pin_to_core(5);
 
-    constexpr int LOOP {1};
+    constexpr int LOOP {1'000'000};
 
     EXPECT_NO_THROW({
         rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
@@ -42,7 +43,7 @@ TEST(ThreadPoolTests, TestReturnValue) {
 
     for (size_t i = 0; i < LOOP; ++i) {
         rts::enqueue([] {
-            return 23;
+
         });
     }
 
@@ -50,26 +51,6 @@ TEST(ThreadPoolTests, TestReturnValue) {
         rts::finalize_soft();
     }) << "finalize_soft() should not throw.";
 }
-
-// TEST(ThreadPoolTests, TestEmptyFunctions) {
-//     pin_to_core(5);
-//
-//     constexpr int LOOP {1};
-//
-//     EXPECT_NO_THROW({
-//         rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
-//     }) << "initialize_runtime() should not throw.";
-//
-//     for (size_t i = 0; i < LOOP; ++i) {
-//         rts::enqueue([] {
-//             std::osyncstream(std::cout) << "function called" << std::endl;
-//         });
-//     }
-//
-//     EXPECT_NO_THROW({
-//         rts::finalize_soft();
-//     }) << "finalize_soft() should not throw.";
-// }
 
 // TEST(ThreadPoolTests, TestIncrement) {
 //     pin_to_core(5);
@@ -92,24 +73,25 @@ TEST(ThreadPoolTests, TestReturnValue) {
 //     EXPECT_EQ(count, LOOP);
 // }
 
-// TEST(ThreadPoolTests, TestWorkStealing){
-//     pin_to_core(5);
-//     EXPECT_NO_THROW({
-//         rts::initialize_runtime<rts::DefaultThreadPool>(2, 1024);
-//     }) << "initialize_runtime() should not throw.";
-//
-//     for (int i = 0; i < 1000; i++) {
-//         rts::enqueue([i]{std::cout << i << std::endl;});
-//         rts::enqueue([i] {
-//             std::this_thread::sleep_for(std::chrono::milliseconds(5));
-//             std::osyncstream(std::cout) << "---" << i << std::endl;
-//         });
-//     }
-//
-//     EXPECT_NO_THROW({
-//         rts::finalize_soft();
-//     }) << "finalize_soft() should not throw.";
-// }
+
+TEST(ThreadPoolTests, TestWorkStealing){
+    pin_to_core(5);
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(2, 1024);
+    }) << "initialize_runtime() should not throw.";
+
+    for (int i = 0; i < 1000; i++) {
+        rts::enqueue([i]{std::cout << i << std::endl;});
+        rts::enqueue([i] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::osyncstream(std::cout) << "---" << i << std::endl;
+        });
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+}
 
 
 
@@ -241,6 +223,46 @@ INSTANTIATE_TEST_SUITE_P(
         return os.str();
     });
 
+class IntegerThenTests : public ::testing::TestWithParam<EnqueueParams> {};
+
+TEST_P(IntegerThenTests, ContinuationStress) {
+    const auto& p = GetParam();
+    pin_to_core(5);
+
+
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+    }) << "initialize_runtime() should not throw.";
+
+    for (size_t i = 0; i < p.loop_count; ++i) {
+        auto f1 = rts::enqueue_async([i] {return i;});
+        auto f2 = f1.then([](std::tuple<int> t) { return std::get<0>(t); });
+        EXPECT_EQ(f2.get(), i);
+    }
+
+    std::cout << "[Cores " << p.num_threads
+              << " | Cap " << p.queue_capacity
+              << " | Loop " << p.loop_count
+              << "]" << std::endl;
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+}
+
+// Instantiate the parameter combinations
+INSTANTIATE_TEST_SUITE_P(
+    ThreadPoolThenTests,
+    IntegerThenTests,
+    ::testing::ValuesIn(GenerateParams()),
+    [](const testing::TestParamInfo<EnqueueParams>& info) {
+        std::ostringstream os;
+        os << "Cores" << info.param.num_threads
+           << "_Cap" << info.param.queue_capacity
+           << "_Loop" << info.param.loop_count;
+        return os.str();
+    });
+
 
 class MultipleThenTests : public ::testing::TestWithParam<EnqueueParams> {};
 TEST_P(MultipleThenTests, MultipleThenStress) {
@@ -316,6 +338,56 @@ TEST_P(RecursiveThenTests, MultipleThenStress) {
 INSTANTIATE_TEST_SUITE_P(
     RecursiveThenTests,
     RecursiveThenTests,
+    ::testing::ValuesIn(GenerateParams()),
+    [](const testing::TestParamInfo<EnqueueParams>& info) {
+        std::ostringstream os;
+        os << "Cores" << info.param.num_threads
+           << "_Cap" << info.param.queue_capacity
+           << "_Loop" << info.param.loop_count;
+        return os.str();
+    });
+
+
+class TestWorkStealingLongTasks : public ::testing::TestWithParam<EnqueueParams> {};
+
+TEST_P(TestWorkStealingLongTasks, StealLongTasks) {
+    const auto& p = GetParam();
+    pin_to_core(5);
+
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+    }) << "initialize_runtime() should not throw.";
+
+    std::atomic<size_t> completed{0};
+
+    // Each iteration schedules 1 long task and (num_threads - 1) short tasks.
+    for (size_t i = 0; i < p.loop_count; ++i) {
+        // Long task
+        rts::enqueue([&completed] {
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
+            ++completed;
+        });
+
+        // Remaining workers get short tasks
+        for (size_t t = 1; t < p.num_threads; ++t) {
+            rts::enqueue([&completed] { ++completed; });
+        }
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+
+    // Each iteration enqueued num_threads tasks
+    const auto expected = p.loop_count * p.num_threads;
+    ASSERT_EQ(completed.load(), expected)
+        << "All tasks should complete even when one worker executes longer tasks.";
+}
+
+// Instantiate parameters
+INSTANTIATE_TEST_SUITE_P(
+    WorkStealingLongTasks,
+    TestWorkStealingLongTasks,
     ::testing::ValuesIn(GenerateParams()),
     [](const testing::TestParamInfo<EnqueueParams>& info) {
         std::ostringstream os;

@@ -14,16 +14,23 @@ include(FetchContent)
 # ─────────────────────────────────────────────
 # Core library
 # ─────────────────────────────────────────────
-add_library(Runtime INTERFACE)
+add_library(Runtime
+        runtime/Worker.cpp
+)
 
 target_include_directories(Runtime
-        INTERFACE
+        PUBLIC
         ${CMAKE_SOURCE_DIR}/runtime
         ${CMAKE_SOURCE_DIR}/async
         ${CMAKE_SOURCE_DIR}/external
         ${CMAKE_SOURCE_DIR}/external/WorkStealingQueue/include
         ${CMAKE_SOURCE_DIR}/external/MPMCQueue/include
 )
+
+add_library(Bench INTERFACE)
+target_include_directories(Bench INTERFACE ${CMAKE_SOURCE_DIR}/bench)
+
+
 
 # ─────────────────────────────────────────────
 # GoogleTest
@@ -43,6 +50,8 @@ if(BUILD_TESTS)
 
     add_executable(MiniRTS_tests
             test/test_runtime.cpp
+            test/test_future.cpp
+            test/test_when_all.cpp
     )
 
     target_link_libraries(MiniRTS_tests
@@ -72,11 +81,16 @@ if(BUILD_BENCHMARKS)
     add_executable(MiniRTS_bench
             bench/bench.cpp
     )
+    target_include_directories(MiniRTS_bench
+            PRIVATE
+            ${CMAKE_SOURCE_DIR}/bench
+    )
 
     target_link_libraries(MiniRTS_bench
             PRIVATE
             benchmark::benchmark
             Runtime
+            Bench
     )
 
 endif()
