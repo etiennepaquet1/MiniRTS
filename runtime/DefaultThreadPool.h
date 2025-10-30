@@ -12,15 +12,19 @@
 
 #include <atomic>
 #include <cassert>
+#include <functional>
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <utility>
 #include <vector>
+#include <syncstream>
 
 #include "Constants.h"
 #include "Task.h"
 #include "ThreadPool.h"
 #include "Worker.h"
+#include "Utils.h"
 
 namespace rts {
 
@@ -45,11 +49,6 @@ namespace rts {
 
 
 
-        DefaultThreadPool(const DefaultThreadPool&) = delete;
-        DefaultThreadPool& operator=(const DefaultThreadPool&) = delete;
-        DefaultThreadPool(DefaultThreadPool&&) = delete;
-        DefaultThreadPool& operator=(DefaultThreadPool&&) = delete;
-
     public:
         /**
          * @brief Constructs a thread pool with the given number of threads and queue capacity.
@@ -69,6 +68,15 @@ namespace rts {
             assert(num_threads_ > 0 && "ThreadPool must have at least one thread");
             assert(queue_capacity_ > 0 && "Queue capacity must be non-zero");
         }
+
+        /**
+         * @brief Disable copy and move semantics — thread pools cannot be safely duplicated or transferred.
+         */
+        DefaultThreadPool(const DefaultThreadPool&) = delete;             ///< Non-copyable
+        DefaultThreadPool& operator=(const DefaultThreadPool&) = delete;  ///< Non-copy-assignable
+        DefaultThreadPool(DefaultThreadPool&&) = delete;                  ///< Non-movable
+        DefaultThreadPool& operator=(DefaultThreadPool&&) = delete;       ///< Non-move-assignable
+
 
         /**
          * @brief Destructor — performs a hard shutdown and joins all workers.

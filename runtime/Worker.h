@@ -11,14 +11,27 @@
 #include <vector>
 
 #include "Constants.h"
-#include "SPSCQueue/include/rigtorp/SPSCQueue.h"
 #include "Task.h"
 #include "Utils.h"
+
+#include "SPSCQueue/include/rigtorp/SPSCQueue.h"
 #include "WorkStealingQueue/include/WorkStealingQueue.h"
 
 
 namespace rts {
-
+    /**
+     * @brief Represents a single worker thread in the MiniRTS thread pool.
+     *
+     * Each Worker owns:
+     *  - A work-stealing deque (WSQ) for local tasks.
+     *  - An SPSC queue (SPSCQ) for external submissions.
+     *  - A thread executing `run()`, which continually processes tasks.
+     *
+     * Workers cooperate through the shared vector `workers_vector_`
+     * and coordinate shutdown via shared atomic flags.
+     *
+     * Thread-safe and non-copyable.
+     */
     class Worker;
     inline thread_local Worker* tls_worker = nullptr;
 
@@ -47,6 +60,17 @@ namespace rts {
                                                 workers_vector_(workers_vector),
                                                 active_workers_(active_workers){}
 
+
+        /**
+         * @brief Workers are non-copyable but movable.
+         *        Each Worker uniquely owns its thread and task queues.
+         *        Movability is required for std::vector<Worker>.
+         */
+        Worker(const Worker&) = delete;
+        Worker& operator=(const Worker&) = delete;
+        Worker(Worker&&) noexcept = default;
+        Worker& operator=(Worker&&) noexcept = default;
+
         [[nodiscard]] size_t wsq_size() const {
             return wsq_->size();
         }
@@ -55,8 +79,6 @@ namespace rts {
             return wsq_->steal();
         }
 
-        // TODO: function way too long
-        // TODO: use [[likely]]
         void run(size_t num_threads = 1) noexcept;
         // {
         //     active_workers_->fetch_add(1, std::memory_order_release);
