@@ -103,15 +103,16 @@ TEST(ThreadPoolTests, TestThenOnReadyFuture) {
 //     rts::finalize_soft();
 // }
 
-
+// TODO: investigate why it breaks after ~400 000
 TEST(ThreadPoolTests, TestLongChain) {
     pin_to_core(5);
     rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
 
-    constexpr int N = 100;
-    auto fut = rts::enqueue_async([] { return 1; });
+    std::atomic<int> ct {0};
+    constexpr int N = 10'000;
+    auto fut = rts::enqueue_async([&ct] { ++ct; return 1; });
     for (int i = 0; i < N; ++i) {
-        fut = fut.then([](int x) { return x + 1; });
+        fut = fut.then([&ct](int x) { ++ct; return x + 1; });
     }
     EXPECT_EQ(fut.get(), N + 1);
 

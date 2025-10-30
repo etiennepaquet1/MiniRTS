@@ -306,3 +306,53 @@ INSTANTIATE_TEST_SUITE_P(
            << "_Loop" << info.param.loop_count;
         return os.str();
     });
+
+
+class TestWorkStealingLongTasks : public ::testing::TestWithParam<EnqueueParams> {};
+
+TEST_P(TestWorkStealingLongTasks, StealLongTasks) {
+    const auto& p = GetParam();
+    pin_to_core(5);
+
+    EXPECT_NO_THROW({
+        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+    }) << "initialize_runtime() should not throw.";
+
+    std::atomic<size_t> completed{0};
+
+    // Each iteration schedules 1 long task and (num_threads - 1) short tasks.
+    for (size_t i = 0; i < p.loop_count; ++i) {
+        // Long task
+        rts::enqueue([&completed] {
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
+            ++completed;
+        });
+
+        // Remaining workers get short tasks
+        for (size_t t = 1; t < p.num_threads; ++t) {
+            rts::enqueue([&completed] { ++completed; });
+        }
+    }
+
+    EXPECT_NO_THROW({
+        rts::finalize_soft();
+    }) << "finalize_soft() should not throw.";
+
+    // Each iteration enqueued num_threads tasks
+    const auto expected = p.loop_count * p.num_threads;
+    ASSERT_EQ(completed.load(), expected)
+        << "All tasks should complete even when one worker executes longer tasks.";
+}
+
+// Instantiate parameters
+INSTANTIATE_TEST_SUITE_P(
+    WorkStealingLongTasks,
+    TestWorkStealingLongTasks,
+    ::testing::ValuesIn(GenerateParams()),
+    [](const testing::TestParamInfo<EnqueueParams>& info) {
+        std::ostringstream os;
+        os << "Cores" << info.param.num_threads
+           << "_Cap" << info.param.queue_capacity
+           << "_Loop" << info.param.loop_count;
+        return os.str();
+    });
