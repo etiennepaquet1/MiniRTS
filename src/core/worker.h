@@ -1,5 +1,5 @@
 /**
- * @file Worker.h
+ * @file worker.h
  * @brief Defines the rts::Worker class, representing an individual execution thread
  *        in the MiniRTS runtime system. Each worker maintains its own local queues,
  *        participates in work-stealing, and executes tasks until shutdown.
@@ -17,9 +17,9 @@
 #include <utility>
 #include <vector>
 
-#include "Constants.h"
-#include "Task.h"
-#include "Utils.h"
+#include "constants.h"
+#include "task.h"
+#include "utils.h"
 
 #include "SPSCQueue/include/rigtorp/SPSCQueue.h"
 #include "WorkStealingQueue/include/WorkStealingQueue.h"

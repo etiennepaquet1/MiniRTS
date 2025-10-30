@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Constants.h"
-#include "Task.h"
+#include "constants.h"
+#include "task.h"
 
 
 namespace rts {

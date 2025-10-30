@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
-#include "Future.h"
-#include "Promise.h"
-#include "Runtime.h"
-#include "Utils.h"
-#include "DefaultThreadPool.h"
+#include "future.h"
+#include "promise.h"
+#include "runtime.h"
+#include "utils.h"
+#include "default_thread_pool.h"
 
 
 // ─────────────────────────────────────────────────────────────

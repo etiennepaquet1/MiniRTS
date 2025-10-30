@@ -3,9 +3,9 @@
 #include <memory>
 #include <mutex>
 
-#include "SharedState.h"
-#include "Future.h"
-#include "Worker.h"
+#include "shared_state.h"
+#include "future.h"
+#include "worker.h"
 
 namespace rts::async {
 
