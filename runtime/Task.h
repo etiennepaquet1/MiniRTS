@@ -45,9 +45,7 @@ struct Task {
     /// @brief Default-constructed Task represents an empty/no-op task.
     Task() noexcept = default;
 
-    // ─────────────────────────────────────────────────────────────
     // Rule of five — Task is move-only to avoid double free.
-    // ─────────────────────────────────────────────────────────────
 
     Task(const Task&) = delete;
 
