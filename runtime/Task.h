@@ -63,17 +63,21 @@ struct Task {
      */
     template <typename F>
     requires (!std::same_as<std::decay_t<F>, Task>)
-    explicit Task(F&& f) noexcept {
+    Task(F&& f) noexcept {
         using Fn = std::decay_t<F>;
         callable_ptr = new Fn(std::forward<F>(f));
 
+        assert(callable_ptr && "Task allocation failed");
         invoke_fn = [](void* p) noexcept {
+            assert(p && "Invalid function pointer in invoke()");
             (*static_cast<Fn*>(p))();
         };
 
         destroy_fn = [](void* p) noexcept {
+            assert(p && "Invalid function pointer in destroy()");
             delete static_cast<Fn*>(p);
         };
+        assert(invoke_fn && destroy_fn && "Invalid function pointers set in Task");
     }
 
     /**
@@ -81,7 +85,8 @@ struct Task {
      * @note The Task must be valid (non-empty).
      */
     void operator()() const noexcept {
-        assert(invoke_fn && callable_ptr);
+        assert(invoke_fn && "Task::invoke_fn is null");
+        assert(callable_ptr && "Task::callable_ptr is null");
         invoke_fn(callable_ptr);
     }
 
@@ -89,8 +94,11 @@ struct Task {
      * @brief Destroys the stored callable and resets the task to empty.
      */
     void destroy() noexcept {
-        if (destroy_fn && callable_ptr)
-            destroy_fn(callable_ptr);
+        assert((callable_ptr && invoke_fn && destroy_fn) &&
+       "Invalid Task partial state: missing one of the members");
+
+        destroy_fn(callable_ptr);
+
         callable_ptr = nullptr;
         invoke_fn = nullptr;
         destroy_fn = nullptr;
