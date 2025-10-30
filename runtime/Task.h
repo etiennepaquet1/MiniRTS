@@ -1,45 +1,93 @@
+/**
+ * @file Task.h
+ * @brief Defines the Task type — a small, move-only, type-erased callable wrapper
+ *        used by the RTS scheduler to represent units of executable work.
+ *
+ * Each Task stores:
+ *   - a pointer to a heap-allocated callable,
+ *   - a function pointer to invoke it,
+ *   - and a function pointer to destroy it.
+ *
+ * The design avoids std::function overhead and allows non-throwing, type-erased
+ * execution in hot paths. Tasks are move-only to prevent accidental double-deletes.
+ */
+
 #pragma once
 
 #include <cassert>
 #include <type_traits>
 #include <utility>
 
+/**
+ * @brief Represents a move-only, type-erased callable used by the runtime.
+ *
+ * A Task is the basic executable unit within the RTS. It holds a pointer
+ * to a heap-allocated callable and the function pointers needed to
+ * invoke and destroy it safely. It is intended to be passed around
+ * thread-safe queues (SPSC, MPMC, etc.) and executed asynchronously.
+ */
 struct Task {
+    /// @brief Function pointer type for invoking the stored callable.
     using InvokeFn  = void(*)(void*) noexcept;
+
+    /// @brief Function pointer type for destroying the stored callable.
     using DestroyFn = void(*)(void*) noexcept;
 
-    void*       callable_ptr = nullptr;
-    InvokeFn    invoke_fn    = nullptr;
-    DestroyFn   destroy_fn   = nullptr;
+    /// @brief Pointer to the heap-allocated callable.
+    void* callable_ptr = nullptr;
 
+    /// @brief Function pointer to invoke the callable.
+    InvokeFn invoke_fn = nullptr;
+
+    /// @brief Function pointer to destroy the callable.
+    DestroyFn destroy_fn = nullptr;
+
+    /// @brief Default-constructed Task represents an empty/no-op task.
     Task() noexcept = default;
 
+    // ─────────────────────────────────────────────────────────────
+    // Rule of five — Task is move-only to avoid double free.
+    // ─────────────────────────────────────────────────────────────
 
-    // Task is move-only to avoid double-free.
-    Task(const Task& other) = delete;
-    Task& operator=(const Task&) noexcept = default;
+    Task(const Task&) = delete;
+
+    Task& operator=(const Task&) = delete;
 
     Task(Task&& other) noexcept = default;
 
-    Task& operator=(Task&&) noexcept = default;
+    Task& operator=(Task&& other) noexcept = default;
 
-    // Construct from callable.
+    /**
+     * @brief Constructs a Task from any callable (lambda, functor, etc.).
+     * @tparam F Callable type.
+     */
     template <typename F>
     requires (!std::same_as<std::decay_t<F>, Task>)
-    Task(F&& f) noexcept {
+    explicit Task(F&& f) noexcept {
         using Fn = std::decay_t<F>;
         callable_ptr = new Fn(std::forward<F>(f));
-        invoke_fn = [](void* p) noexcept { (*static_cast<Fn*>(p))(); };
-        destroy_fn = [](void* p) noexcept { delete static_cast<Fn*>(p); };
+
+        invoke_fn = [](void* p) noexcept {
+            (*static_cast<Fn*>(p))();
+        };
+
+        destroy_fn = [](void* p) noexcept {
+            delete static_cast<Fn*>(p);
+        };
     }
 
-    // Invoke.
+    /**
+     * @brief Invokes the stored callable.
+     * @note The Task must be valid (non-empty).
+     */
     void operator()() const noexcept {
         assert(invoke_fn && callable_ptr);
         invoke_fn(callable_ptr);
     }
 
-    // Manual destroy.
+    /**
+     * @brief Destroys the stored callable and resets the task to empty.
+     */
     void destroy() noexcept {
         if (destroy_fn && callable_ptr)
             destroy_fn(callable_ptr);
@@ -47,7 +95,11 @@ struct Task {
         invoke_fn = nullptr;
         destroy_fn = nullptr;
     }
-    operator bool() const noexcept {
-        return (callable_ptr && invoke_fn && destroy_fn);
+
+    /**
+     * @brief Returns true if the Task contains a valid callable.
+     */
+    explicit operator bool() const noexcept {
+        return callable_ptr && invoke_fn && destroy_fn;
     }
 };

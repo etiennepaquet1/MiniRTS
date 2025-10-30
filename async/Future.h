@@ -1,8 +1,6 @@
 /**
  * @file Future.h
- * @brief Defines the rts::async::Future class template, which represents a value
- *        that will become available asynchronously. Supports chaining continuations
- *        via .then() and integration with the runtime enqueue() mechanism.
+ * @brief The future type for all tasks.
  */
 
 #pragma once
@@ -22,12 +20,11 @@ namespace rts {
     /**
      * @brief Schedules a Task for asynchronous execution within the runtime system.
      */
-    void enqueue(Task&&) noexcept;
+    void enqueue(Task &&) noexcept;
 }
 
 namespace rts::async {
-
-    template <typename T>
+    template<typename T>
     class Promise;
 
     /**
@@ -39,13 +36,14 @@ namespace rts::async {
      */
     template<typename T>
     class Future {
-        std::shared_ptr<SharedState<T>> state_;
+        std::shared_ptr<SharedState<T> > state_;
 
     public:
         using value_type = T;
 
-        explicit Future(std::shared_ptr<SharedState<T>> s)
-            : state_(std::move(s)) {}
+        explicit Future(std::shared_ptr<SharedState<T> > s)
+            : state_(std::move(s)) {
+        }
 
         /**
          * @brief Returns true if the value or exception is already available.
@@ -59,7 +57,8 @@ namespace rts::async {
          *        (Consider replacing with condition_variable later.)
          */
         void wait() const {
-            while (!is_ready()) {}
+            while (!is_ready()) {
+            }
         }
 
         /**
@@ -91,8 +90,8 @@ namespace rts::async {
          * @param f  The continuation function.
          * @return A new Future representing the result of `f`.
          */
-        template <typename F>
-        auto then(F&& f) -> Future<std::invoke_result_t<F, T>> {
+        template<typename F>
+        auto then(F &&f) -> Future<std::invoke_result_t<F, T> > {
             using U = std::invoke_result_t<F, T>;
 
             Promise<U> p;
@@ -130,7 +129,7 @@ namespace rts::async {
 
         // Forward declaration of void-specialized then()
         template<typename F>
-        Future<std::invoke_result_t<F>> then(F&& f);
+        Future<std::invoke_result_t<F> > then(F &&f);
     };
 
 
@@ -138,9 +137,9 @@ namespace rts::async {
      * @brief Specialization of Future<void>::then() for chaining continuations
      *        after a void-returning Future.
      */
-    template <>
-    template <typename F>
-    Future<std::invoke_result_t<F>> Future<void>::then(F&& f) {
+    template<>
+    template<typename F>
+    Future<std::invoke_result_t<F> > Future<void>::then(F &&f) {
         using U = std::invoke_result_t<F>;
 
         Promise<U> p;
@@ -173,5 +172,4 @@ namespace rts::async {
 
         return fut_next;
     }
-
 } // namespace rts::async
