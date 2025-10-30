@@ -27,6 +27,11 @@ target_include_directories(Runtime
         ${CMAKE_SOURCE_DIR}/external/MPMCQueue/include
 )
 
+add_library(Bench INTERFACE)
+target_include_directories(Bench INTERFACE ${CMAKE_SOURCE_DIR}/bench)
+
+
+
 # ─────────────────────────────────────────────
 # GoogleTest
 # ─────────────────────────────────────────────
@@ -75,14 +80,17 @@ if(BUILD_BENCHMARKS)
 
     add_executable(MiniRTS_bench
             bench/bench.cpp
-            a.cpp
-            runtime/Worker.cpp
+    )
+    target_include_directories(MiniRTS_bench
+            PRIVATE
+            ${CMAKE_SOURCE_DIR}/bench
     )
 
     target_link_libraries(MiniRTS_bench
             PRIVATE
             benchmark::benchmark
             Runtime
+            Bench
     )
 
 endif()

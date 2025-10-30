@@ -6,6 +6,7 @@
 #include "Future.h"
 #include "Promise.h"
 #include "DefaultThreadPool.h"
+#include "Utils.h"
 
 
 
@@ -116,6 +117,9 @@ inline int calibrate_busy_work(int target_ns = 1000) {
 // OVERHEAD = TOTAL_TIME - ((TARGET_NS * LOOP) / NUM_CORES)
 static void BM_Enqueue_Overhead_1_000_000(benchmark::State &state) {
     pin_to_core(5);
+
+    if (!is_tsc_invariant())
+        state.SkipWithError("reason");
 
     constexpr int LOOP = 1'000'000;
     constexpr int TARGET_NS = 1000;

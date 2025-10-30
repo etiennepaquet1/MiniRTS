@@ -29,7 +29,7 @@ namespace rts::async {
 
         Future(std::shared_ptr<SharedState<T>> s) : state_(std::move(s)) {}
 
-        bool is_ready() const noexcept {
+        [[nodiscard]] bool is_ready() const noexcept {
             return state_->ready.load(std::memory_order_acquire);
         }
 
@@ -73,7 +73,6 @@ namespace rts::async {
                     p.set_exception(std::current_exception());
                 }
             };
-
             {
                 std::lock_guard lk(state_->mtx);
                 // If already ready, run immediately.
