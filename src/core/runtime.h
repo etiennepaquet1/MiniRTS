@@ -18,6 +18,7 @@
 #include <utility>
 #include <vector>
 
+#include "concepts.h"
 #include "task.h"
 #include "thread_pool.h"
 #include "constants.h"

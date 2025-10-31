@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "concepts.h"
 #include "shared_state.h"
 #include "task.h"
 #include "utils.h"

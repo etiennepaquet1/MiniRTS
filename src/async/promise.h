@@ -16,6 +16,7 @@
 #include <mutex>
 #include <type_traits>
 
+#include "concepts.h"
 #include "shared_state.h"
 #include "future.h"
 #include "worker.h"
@@ -80,7 +81,8 @@ namespace rts::async {
          * Notifies all registered continuations once ready.
          */
         template<typename U = T>
-        void set_value(U&& value) noexcept requires (!std::is_void_v<U>) {
+        void set_value(U &&value) noexcept requires (!std::is_void_v<U> &&
+                                                     concepts::PromiseValue<U>) {
             assert(state_ && "set_value() called on moved-from Promise");
 
             {

@@ -16,6 +16,7 @@ include(FetchContent)
 # ─────────────────────────────────────────────
 add_library(Runtime
         src/core/worker.cpp
+        src/core/concepts.h
 )
 
 target_include_directories(Runtime
