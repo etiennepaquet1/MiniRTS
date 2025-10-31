@@ -28,7 +28,8 @@ target_include_directories(Runtime
         ${CMAKE_SOURCE_DIR}/external/MPMCQueue/include
 )
 
-add_library(Bench INTERFACE)
+add_library(Bench INTERFACE
+        src/api/api.h)
 target_include_directories(Bench INTERFACE ${CMAKE_SOURCE_DIR}/bench)
 
 

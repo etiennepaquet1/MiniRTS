@@ -196,7 +196,7 @@ TEST_P(ThenParamTests, ContinuationStress) {
     }) << "initialize_runtime() should not throw.";
 
     for (size_t i = 0; i < p.loop_count; ++i) {
-        auto fut = rts::enqueue_async([] {});
+        auto fut = rts::async([] {});
         fut.then([] {});
     }
 
@@ -235,7 +235,7 @@ TEST_P(IntegerThenTests, ContinuationStress) {
     }) << "initialize_runtime() should not throw.";
 
     for (size_t i = 0; i < p.loop_count; ++i) {
-        auto f1 = rts::enqueue_async([i] {return i;});
+        auto f1 = rts::async([i] {return i;});
         auto f2 = f1.then([](std::tuple<int> t) { return std::get<0>(t); });
         EXPECT_EQ(f2.get(), i);
     }
@@ -275,7 +275,7 @@ TEST_P(MultipleThenTests, MultipleThenStress) {
 
     std::atomic<int> counter{0};
     for (size_t i = 0; i < p.loop_count; ++i) {
-        auto fut = rts::enqueue_async([&counter] { ++counter; });
+        auto fut = rts::async([&counter] { ++counter; });
         fut.then([&counter] { ++counter; });
         fut.then([&counter] { ++counter; });
         fut.then([&counter] { ++counter; });
@@ -317,7 +317,7 @@ TEST_P(RecursiveThenTests, MultipleThenStress) {
 
     std::atomic<int> counter{0};
     for (size_t i = 0; i < p.loop_count; ++i) {
-        auto f1 = rts::enqueue_async([&counter] { ++counter; });
+        auto f1 = rts::async([&counter] { ++counter; });
         auto f2 = f1.then([&counter] { ++counter; });
         auto f3 = f1.then([&counter] { ++counter; });
         auto f4 = f3.then([&counter] { ++counter; });

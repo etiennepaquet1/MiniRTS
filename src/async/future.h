@@ -24,7 +24,7 @@ namespace rts {
     void enqueue(Task &&) noexcept;
 }
 
-namespace rts::async {
+namespace core::async {
 
     template<typename T>
     class Promise;
@@ -137,7 +137,7 @@ namespace rts::async {
             {
                 std::lock_guard lk(state_->mtx);
                 if (is_ready()) {
-                    enqueue(std::move(cont));
+                    rts::enqueue(std::move(cont));
                 } else {
                     state_->continuations.push_back(std::move(cont));
                 }
@@ -189,7 +189,7 @@ namespace rts::async {
         {
             std::lock_guard lk(state_->mtx);
             if (is_ready()) {
-                enqueue(std::move(cont));
+                rts::enqueue(std::move(cont));
             } else {
                 state_->continuations.push_back(std::move(cont));
             }

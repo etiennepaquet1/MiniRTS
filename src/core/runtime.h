@@ -23,7 +23,7 @@
 #include "thread_pool.h"
 #include "constants.h"
 
-namespace rts::async {
+namespace core::async {
     template <typename T>
     class Promise;
 
@@ -31,8 +31,7 @@ namespace rts::async {
     class Future;
 }
 
-namespace rts {
-
+namespace core {
     class DefaultThreadPool;
 
     // ─────────────────────────────────────────────────────────────
@@ -53,7 +52,11 @@ namespace rts {
 
     /// @brief Cached saturation metric for monitoring queue load (optional diagnostic).
     inline float saturation_cached = 0.0f;
+}
 
+namespace rts
+{
+    using namespace core;
     // ─────────────────────────────────────────────────────────────
     // ────────────────  Runtime initialization API  ────────────────
     // ─────────────────────────────────────────────────────────────
@@ -164,7 +167,7 @@ namespace rts {
      * @note The callable is executed inside the runtime’s thread pool.
      */
     template<typename F, typename... Args>
-    auto enqueue_async(F&& f, Args&&... args)
+    auto async(F&& f, Args&&... args)
         -> async::Future<std::invoke_result_t<F, Args...>> {
 
         using T = std::invoke_result_t<F, Args...>;
