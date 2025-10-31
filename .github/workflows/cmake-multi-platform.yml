@@ -1,0 +1,43 @@
+name: MiniRTS CI
+
+on:
+  push:
+    branches:
+      - master   # runs when code is pushed or merged into master
+  pull_request:
+    branches:
+      - master   # optional: test PRs targeting master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ─────────────── Checkout ───────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ─────────────── Setup GCC 13 ───────────────
+      - name: Install GCC 13 and CMake dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-13 cmake make
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+          g++ --version
+
+      # ─────────────── Configure ───────────────
+      - name: Configure with CMake
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_CXX_COMPILER=g++-13 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=ON \
+            -DBUILD_BENCHMARKS=OFF
+
+      # ─────────────── Build ───────────────
+      - name: Build project
+        run: cmake --build build -- -j$(nproc)
+
+      # ─────────────── Run unit tests ───────────────
+      - name: Run unit tests
+        run: ctest --test-dir build --output-on-failure
