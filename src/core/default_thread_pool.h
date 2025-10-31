@@ -69,7 +69,7 @@ namespace core {
         }
 
         /**
-         * @brief Disable copy and move semantics — thread pools cannot be safely duplicated or transferred.
+         * @brief Disable copy and move semantics. Thread pools cannot be safely duplicated or transferred.
          */
         DefaultThreadPool(const DefaultThreadPool&) = delete;             ///< Non-copyable
         DefaultThreadPool& operator=(const DefaultThreadPool&) = delete;  ///< Non-copy-assignable

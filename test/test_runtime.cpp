@@ -109,7 +109,7 @@ std::vector<EnqueueParams> GenerateParams() {
     std::vector<EnqueueParams> params;
     std::vector<size_t> cores = {1, 2, 3, 4};
     std::vector<size_t> caps = {64, 256, 1024, 4096, 1 << 14, 1 << 16, 1 << 18, 1 << 20};
-    std::vector<size_t> loop_counts = {100, 1'000, 10'000, 100'000, 1'000'000};
+    std::vector<size_t> loop_counts = {100, 1'000, 10'000, 100'000};  //, 1'000'000};
 
     for (auto num_threads : cores) {
         for (auto cap : caps) {

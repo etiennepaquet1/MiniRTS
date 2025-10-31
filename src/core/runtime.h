@@ -29,6 +29,7 @@ namespace core::async {
     class Promise;
 
     template <typename T>
+    requires concepts::FutureValue<T>
     class Future;
 }
 
