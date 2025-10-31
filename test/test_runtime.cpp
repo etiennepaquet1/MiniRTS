@@ -14,7 +14,7 @@
 TEST(ThreadPoolTests, InitAndFinalize) {
     pin_to_core(5);
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>();
+        rts::initialize_runtime();
     }) << "initialize_runtime() should not throw.";
 
     EXPECT_NO_THROW({
@@ -22,7 +22,7 @@ TEST(ThreadPoolTests, InitAndFinalize) {
     }) << "finalize_soft() should not throw.";
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>();
+        rts::initialize_runtime();
     }) << "initialize_runtime() should not throw.";
 
     EXPECT_NO_THROW({
@@ -38,7 +38,7 @@ TEST(ThreadPoolTests, TestEmptyFunctions) {
     constexpr int LOOP {1'000'000};
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+        rts::initialize_runtime(1, 64);
     }) << "initialize_runtime() should not throw.";
 
     for (size_t i = 0; i < LOOP; ++i) {
@@ -59,7 +59,7 @@ TEST(ThreadPoolTests, TestEmptyFunctions) {
 //
 //     std::atomic<int> count {0};
 //     EXPECT_NO_THROW({
-//         rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+//         rts::initialize_runtime(1, 64);
 //     }) << "initialize_runtime() should not throw.";
 //
 //     for (size_t i = 0; i < LOOP; ++i) {
@@ -77,7 +77,7 @@ TEST(ThreadPoolTests, TestEmptyFunctions) {
 TEST(ThreadPoolTests, TestWorkStealing){
     pin_to_core(5);
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(2, 1024);
+        rts::initialize_runtime(2, 1024);
     }) << "initialize_runtime() should not throw.";
 
     for (int i = 0; i < 1000; i++) {
@@ -127,7 +127,7 @@ TEST_P(EmptyEnqueueTests, EnqueueStress) {
     pin_to_core(5);
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+        rts::initialize_runtime(p.num_threads, p.queue_capacity);
     }) << "initialize_runtime() should not throw.";
 
     for (size_t i = 0; i < p.loop_count; ++i) {
@@ -192,7 +192,7 @@ TEST_P(ThenParamTests, ContinuationStress) {
 
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+        rts::initialize_runtime(p.num_threads, p.queue_capacity);
     }) << "initialize_runtime() should not throw.";
 
     for (size_t i = 0; i < p.loop_count; ++i) {
@@ -231,7 +231,7 @@ TEST_P(IntegerThenTests, ContinuationStress) {
 
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+        rts::initialize_runtime(p.num_threads, p.queue_capacity);
     }) << "initialize_runtime() should not throw.";
 
     for (size_t i = 0; i < p.loop_count; ++i) {
@@ -270,7 +270,7 @@ TEST_P(MultipleThenTests, MultipleThenStress) {
     pin_to_core(5);
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+        rts::initialize_runtime(p.num_threads, p.queue_capacity);
     }) << "initialize_runtime() should not throw.";
 
     std::atomic<int> counter{0};
@@ -312,7 +312,7 @@ TEST_P(RecursiveThenTests, MultipleThenStress) {
     pin_to_core(5);
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+        rts::initialize_runtime(p.num_threads, p.queue_capacity);
     }) << "initialize_runtime() should not throw.";
 
     std::atomic<int> counter{0};
@@ -355,7 +355,7 @@ TEST_P(TestWorkStealingLongTasks, StealLongTasks) {
     pin_to_core(5);
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+        rts::initialize_runtime(p.num_threads, p.queue_capacity);
     }) << "initialize_runtime() should not throw.";
 
     std::atomic<size_t> completed{0};

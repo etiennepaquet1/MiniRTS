@@ -10,8 +10,8 @@
 
 
 
-// // Measures the latency of enqueuing 1 million empty tasks with enqueue()
-// // (e.g. the time between enqueuing the first task and finishing the final task.)
+// Measures the latency of enqueuing 1 million empty tasks with enqueue()
+// (e.g. the time between enqueuing the first task and finishing the final task.)
 static void BM_Enqueue_Latency_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
@@ -23,7 +23,7 @@ static void BM_Enqueue_Latency_1_000_000(benchmark::State &state) {
         state.PauseTiming();
 
         // Initialize runtime with current configuration
-        rts::initialize_runtime<rts::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
@@ -109,7 +109,7 @@ static void BM_Enqueue_Overhead_1_000_000(benchmark::State &state) {
         state.PauseTiming();
 
         // Initialize runtime with current configuration
-        rts::initialize_runtime<rts::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
@@ -189,7 +189,7 @@ static void BM_Async_Latency_1_000_000(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
 
-        rts::initialize_runtime<rts::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
@@ -271,7 +271,7 @@ static void BM_Async_Overhead_1_000_000(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
 
-        rts::initialize_runtime<rts::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
@@ -349,7 +349,7 @@ static void BM_Then_Chain_1_000_000(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
 
-        rts::initialize_runtime<rts::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
@@ -416,6 +416,7 @@ BENCHMARK(BM_Then_Chain_1_000_000)
     ->Unit(benchmark::kMillisecond);
 
 
+/*
 // Measures the direct cost of attaching a continuation via .then()
 // Excludes task creation and Promise overhead.
 static void BM_Then_Registration_1_000_000(benchmark::State &state) {
@@ -429,7 +430,7 @@ static void BM_Then_Registration_1_000_000(benchmark::State &state) {
         state.PauseTiming();
 
         // Initialize runtime with current configuration
-        rts::initialize_runtime<rts::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
 
         // Prepare a pre-built future so that only .then() is timed
         std::vector<core::async::Future<void>> futures;
@@ -496,5 +497,6 @@ BENCHMARK(BM_Then_Registration_1_000_000)
     ->Args({4, 1 << 18})
     ->Args({4, 1 << 20})
     ->Unit(benchmark::kMillisecond);
+    */
 
 BENCHMARK_MAIN();
