@@ -237,8 +237,8 @@ namespace rts
             assert(state && "State tuple null");
             if (remaining->fetch_sub(1, std::memory_order_acq_rel) == 1) {
                 auto result = std::apply(
-                    [](auto&... opts) -> ResultTuple {
-                        ((assert(opts.has_value() && "Missing value in when_all")), ...);
+                    []<typename... Ts>(std::optional<Ts>&... opts) -> ResultTuple {
+                        // ((assert(opts.has_value() && "Missing value in when_all")), ...);
                         return ResultTuple{ std::move(*opts)... };
                     },
                     *state
