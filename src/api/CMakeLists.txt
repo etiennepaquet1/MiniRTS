@@ -1,11 +1,7 @@
-# ─────────────────────────────────────────────
-# Public API headers
-# ─────────────────────────────────────────────
-
-# Optional version header generator
-# configure_file(version.h.in version.h @ONLY)
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/version.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/minirts)
-
-# Nothing else needed — headers are installed from parent src/CMakeLists
+# src/api/CMakeLists.txt
+add_library(MiniRTS_api INTERFACE)
+target_include_directories(MiniRTS_api
+        INTERFACE
+        ${CMAKE_SOURCE_DIR}/src/api
+)
+target_link_libraries(MiniRTS_api INTERFACE MiniRTS)

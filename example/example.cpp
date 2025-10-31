@@ -11,6 +11,24 @@
 */
 
 
+
+
 /*
-    To instantiate a new runtime,
+    To instantiate a new runtime, simply call rts::instantiate_runtime().
 */
+
+
+// #include "SPSCQueue/include/rigtorp/SPSCQueue.h"
+// #include "runtime.h"
+//
+// rigtorp::SPSCQueue<int> a(64);
+//
+// rts::initialize_runtime();
+//
+
+#include "api.h"
+
+int main() {
+    rts::initialize_runtime<core::DefaultThreadPool>();
+    return 0;
+}

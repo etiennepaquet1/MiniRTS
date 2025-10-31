@@ -8,9 +8,10 @@ add_compile_options(-Wno-interference-size)
 
 include(GNUInstallDirs)
 
-add_subdirectory(src)    # defines MiniRTS first
-add_subdirectory(bench)  # then benchmarks
+add_subdirectory(src)
+add_subdirectory(bench)
 add_subdirectory(test)
+add_subdirectory(example)
 
 install(EXPORT MiniRTSTargets
         FILE MiniRTSTargets.cmake

@@ -156,7 +156,7 @@ TEST_P(IncrementTaskTests, EnqueueStress) {
     const auto& p = GetParam();
     pin_to_core(5);
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(p.num_threads, p.queue_capacity);
+        rts::initialize_runtime(p.num_threads, p.queue_capacity);
     }) << "initialize_runtime() should not throw.";
 
     std::atomic<int> completed(0);
