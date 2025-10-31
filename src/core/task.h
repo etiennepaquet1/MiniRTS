@@ -60,8 +60,9 @@ struct Task {
      * @tparam F Callable type.
      */
     template <typename F>
-    requires (!std::same_as<std::decay_t<F>, Task>)
-    Task(F&& f) noexcept {
+    requires (  !std::same_as<std::decay_t<F>, Task>) &&
+                std::invocable<std::decay_t<F>&>
+        Task(F&& f) noexcept {
         using Fn = std::decay_t<F>;
         callable_ptr = new Fn(std::forward<F>(f));
 
