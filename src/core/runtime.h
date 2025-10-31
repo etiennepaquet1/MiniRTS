@@ -52,7 +52,7 @@ namespace core {
 
     /// @brief Cached saturation metric for monitoring queue load (optional diagnostic).
     inline float saturation_cached = 0.0f;
-}
+} // namespace core
 
 namespace rts
 {

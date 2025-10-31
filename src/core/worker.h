@@ -21,8 +21,8 @@
 #include "task.h"
 #include "utils.h"
 
-#include "SPSCQueue/include/rigtorp/SPSCQueue.h"
-#include "WorkStealingQueue/include/WorkStealingQueue.h"
+#include "SPSCQueue.h"
+#include "WorkStealingQueue.h"
 
 namespace core {
 

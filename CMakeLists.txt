@@ -16,7 +16,6 @@ include(FetchContent)
 # ─────────────────────────────────────────────
 add_library(Runtime
         src/core/worker.cpp
-        src/core/concepts.h
 )
 
 target_include_directories(Runtime
@@ -25,7 +24,7 @@ target_include_directories(Runtime
         ${CMAKE_SOURCE_DIR}/src/async
         ${CMAKE_SOURCE_DIR}/external
         ${CMAKE_SOURCE_DIR}/external/WorkStealingQueue/include
-        ${CMAKE_SOURCE_DIR}/external/MPMCQueue/include
+        ${CMAKE_SOURCE_DIR}/external/SPSCQueue/include/rigtorp
 )
 
 add_library(Bench INTERFACE
