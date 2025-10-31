@@ -14,8 +14,8 @@ TEST(ThreadPoolTests, TestWhenAll) {
         rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
     }) << "initialize_runtime() should not throw.";
 
-    rts::async::Future<std::tuple<int>> tup = rts::when_all(
-        rts::enqueue_async([] { return 1; })
+    core::async::Future<std::tuple<int>> tup = rts::when_all(
+        rts::async([] { return 1; })
     );
     tup.then([](auto v){ std::cout << std::get<0>(v) << std::endl; });
 
@@ -33,7 +33,7 @@ TEST(ThreadPoolTests, TestWhenAll) {
 //     }) << "initialize_runtime() should not throw.";
 //
 //     auto tup = rts::when_all(
-//         rts::enqueue_async([] {
+//         rts::async([] {
 //             debug_print("1");
 //         })
 //     );

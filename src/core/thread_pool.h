@@ -4,7 +4,7 @@
 #include "task.h"
 
 
-namespace rts {
+namespace core {
 
     template <typename T>
     concept ThreadPool = requires(T t,

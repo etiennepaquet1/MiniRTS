@@ -177,7 +177,7 @@ BENCHMARK(BM_Enqueue_Overhead_1_000_000)
 
 
 
-// Measures the latency of enqueuing 1 million empty tasks with enqueue_async()
+// Measures the latency of enqueuing 1 million empty tasks with async()
 // (e.g. the time between enqueuing the first task and finishing the final task.)
 static void BM_Async_Latency_1_000_000(benchmark::State &state) {
     pin_to_core(5);
@@ -196,7 +196,7 @@ static void BM_Async_Latency_1_000_000(benchmark::State &state) {
         auto start = std::chrono::steady_clock::now();
 
         for (int i = 0; i < LOOP; ++i) {
-            rts::enqueue_async([]{});
+            rts::async([]{});
         }
 
         rts::finalize_soft();
@@ -248,7 +248,7 @@ BENCHMARK(BM_Async_Latency_1_000_000)
     ->Args({4, 1 << 20})
     ->Unit(benchmark::kMillisecond);
 
-// Measures the overhead of enqueuing 1 million small wait tasks with enqueue_async()
+// Measures the overhead of enqueuing 1 million small wait tasks with async()
 // (e.g. the time between enqueuing the first task and finishing the final task
 // minus the total processing time of the tasks.)
 
@@ -278,7 +278,7 @@ static void BM_Async_Overhead_1_000_000(benchmark::State &state) {
         auto start = std::chrono::steady_clock::now();
 
         for (int i = 0; i < LOOP; ++i) {
-            rts::enqueue_async([reps] {
+            rts::async([reps] {
                 int iter {reps};
                 benchmark::DoNotOptimize(iter);
                 for (int i = 0; i < iter; ++i) {
@@ -355,7 +355,7 @@ static void BM_Then_Chain_1_000_000(benchmark::State &state) {
 
         auto start = std::chrono::steady_clock::now();
 
-        auto fut = rts::enqueue_async([] {});
+        auto fut = rts::async([] {});
         for (int i = 0; i < LOOP; ++i)
             fut = fut.then([] {});
 
@@ -432,10 +432,10 @@ static void BM_Then_Registration_1_000_000(benchmark::State &state) {
         rts::initialize_runtime<rts::DefaultThreadPool>(num_threads, queue_capacity);
 
         // Prepare a pre-built future so that only .then() is timed
-        std::vector<rts::async::Future<void>> futures;
+        std::vector<core::async::Future<void>> futures;
         futures.reserve(LOOP);
         for (int i = 0; i < LOOP; ++i) {
-            rts::async::Promise<void> p;
+            core::async::Promise<void> p;
             futures.push_back(p.get_future());
         }
 

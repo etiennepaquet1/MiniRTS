@@ -10,7 +10,7 @@
 
 #include <cstddef>
 
-namespace rts {
+namespace core {
 
     /**
      * @brief Cache-line size used for padding and alignment.

@@ -26,7 +26,7 @@
 #include "worker.h"
 #include "utils.h"
 
-namespace rts {
+namespace core {
 
     /**
      * @brief The default thread pool used by the RTS runtime system.

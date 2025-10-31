@@ -21,7 +21,7 @@
 #include "future.h"
 #include "worker.h"
 
-namespace rts::async {
+namespace core::async {
 
     /**
      * @brief Promise<T> acts as the producer counterpart to Future<T>.

@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 
-namespace rts::concepts {
+namespace core::concepts {
 
     template<typename T>
     concept PromiseValue =

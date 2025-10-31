@@ -12,7 +12,7 @@
 
 #include "task.h"
 
-namespace rts::async {
+namespace core::async {
 
     /**
      * @brief Shared state between a Promise<T> and its corresponding Future<T>.

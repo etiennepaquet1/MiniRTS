@@ -24,7 +24,7 @@
 #include "SPSCQueue/include/rigtorp/SPSCQueue.h"
 #include "WorkStealingQueue/include/WorkStealingQueue.h"
 
-namespace rts {
+namespace core {
 
     /**
      * @brief Forward declaration for TLS pointer.

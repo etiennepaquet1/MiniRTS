@@ -32,7 +32,7 @@ inline int calibrate_busy_work(int target_ns = 1000) {
     double time_per_iter_ns = total_ns / static_cast<double>(iter);
     int iterations_per_target = static_cast<int>(target_ns / time_per_iter_ns);
 
-    if constexpr(rts::DEBUG) {
+    if constexpr(core::DEBUG) {
         std::osyncstream(std::cout)
        << "Total: " << total_ns / 1e6 << " ms, "
        << "Per iteration: " << time_per_iter_ns << " ns, "

@@ -21,7 +21,7 @@ inline void pin_to_core(size_t core_id) {
 }
 
 inline void debug_print(const char* msg) {
-    if constexpr (rts::DEBUG)
+    if constexpr (core::DEBUG)
     {
         std::osyncstream(std::cout) << "[Thread ID: "
             << std::this_thread::get_id() << "]: "
