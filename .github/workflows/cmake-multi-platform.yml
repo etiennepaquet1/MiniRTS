@@ -14,8 +14,10 @@ jobs:
 
     steps:
       # ─────────────── Checkout ───────────────
-      - name: Checkout repository
+      - name: Checkout repository with submodules
         uses: actions/checkout@v4
+        with:
+          submodules: recursive     # ✅ ensures your external/ and SPSCQueue/ dirs are cloned
 
       # ─────────────── Setup GCC 13 ───────────────
       - name: Install GCC 13 and CMake dependencies
