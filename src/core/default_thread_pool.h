@@ -1,5 +1,5 @@
 /**
- * @file DefaultThreadPool.h
+ * @file default_thread_pool.h
  * @brief Defines the default thread pool implementation for the RTS runtime system.
  *
  * This thread pool manages a group of Worker threads that execute submitted Tasks.

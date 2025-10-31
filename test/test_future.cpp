@@ -90,18 +90,6 @@ TEST(ThreadPoolTests, TestThenOnReadyFuture) {
     EXPECT_EQ(result.load(), 99);
 }
 
-// TEST(ThreadPoolTests, TestMoveOnlyType) {
-//     pin_to_core(5);
-//     rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
-//
-//     auto f = rts::enqueue_async([] {
-//         return (std::make_unique<int>(77));
-//     }).then([](std::unique_ptr<int> p) {
-//         EXPECT_EQ(*p, 77);
-//     });
-//
-//     rts::finalize_soft();
-// }
 
 TEST(ThreadPoolTests, TestLongChain) {
     pin_to_core(5);

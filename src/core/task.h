@@ -1,5 +1,5 @@
 /**
- * @file Task.h
+ * @file task.h
  * @brief Defines the Task type — a small, move-only, type-erased callable wrapper
  *        used by the RTS scheduler to represent units of executable work.
  *
@@ -24,7 +24,7 @@
  * A Task is the basic executable unit within the RTS. It holds a pointer
  * to a heap-allocated callable and the function pointers needed to
  * invoke and destroy it safely. It is intended to be passed around
- * thread-safe queues (SPSC, MPMC, etc.) and executed asynchronously.
+ * thread-safe queues and executed asynchronously.
  */
 struct Task {
     /// @brief Function pointer type for invoking the stored callable.
@@ -60,8 +60,9 @@ struct Task {
      * @tparam F Callable type.
      */
     template <typename F>
-    requires (!std::same_as<std::decay_t<F>, Task>)
-    Task(F&& f) noexcept {
+    requires (  !std::same_as<std::decay_t<F>, Task>) &&
+                std::invocable<std::decay_t<F>&>
+        Task(F&& f) noexcept {
         using Fn = std::decay_t<F>;
         callable_ptr = new Fn(std::forward<F>(f));
 

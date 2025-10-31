@@ -1,0 +1,207 @@
+/home/b/CLionProjects/MiniRTS/cmake-build-release/MiniRTS_bench
+2025-10-30T21:13:33-04:00
+Running /home/b/CLionProjects/MiniRTS/cmake-build-release/MiniRTS_bench
+Run on (6 X 3800.03 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x6)
+  L1 Instruction 32 KiB (x6)
+  L2 Unified 256 KiB (x6)
+  L3 Unified 9216 KiB (x1)
+Load Average: 1.03, 1.44, 1.08
+---------------------------------------------------------------------------------------------------
+Benchmark                                         Time             CPU   Iterations UserCounters...
+---------------------------------------------------------------------------------------------------
+BM_Enqueue_Latency_1_000_000/1/64               435 ms          434 ms            2 QueueCapacity=64 Threads=1 Throughput_Mops=2.28034 ns_per_task=438.532
+BM_Enqueue_Latency_1_000_000/1/512              420 ms          420 ms            2 QueueCapacity=512 Threads=1 Throughput_Mops=2.36148 ns_per_task=423.462
+BM_Enqueue_Latency_1_000_000/1/1024             422 ms          422 ms            2 QueueCapacity=1.024k Threads=1 Throughput_Mops=2.32436 ns_per_task=430.226
+BM_Enqueue_Latency_1_000_000/1/4096             424 ms          422 ms            2 QueueCapacity=4.096k Threads=1 Throughput_Mops=2.27659 ns_per_task=439.253
+BM_Enqueue_Latency_1_000_000/1/16384            416 ms          410 ms            2 QueueCapacity=16.384k Threads=1 Throughput_Mops=2.36218 ns_per_task=423.338
+BM_Enqueue_Latency_1_000_000/1/65536            413 ms          385 ms            2 QueueCapacity=65.536k Threads=1 Throughput_Mops=2.4476 ns_per_task=408.563
+BM_Enqueue_Latency_1_000_000/1/262144           413 ms          273 ms            3 QueueCapacity=262.144k Threads=1 Throughput_Mops=2.42999 ns_per_task=411.525
+BM_Enqueue_Latency_1_000_000/1/1048576          411 ms          182 ms            4 QueueCapacity=1.04858M Threads=1 Throughput_Mops=2.45586 ns_per_task=407.189
+BM_Enqueue_Latency_1_000_000/2/64               236 ms          236 ms            3 QueueCapacity=64 Threads=2 Throughput_Mops=4.22522 ns_per_task=236.674
+BM_Enqueue_Latency_1_000_000/2/512              234 ms          234 ms            3 QueueCapacity=512 Threads=2 Throughput_Mops=4.28119 ns_per_task=233.58
+BM_Enqueue_Latency_1_000_000/2/1024             232 ms          232 ms            3 QueueCapacity=1.024k Threads=2 Throughput_Mops=4.29541 ns_per_task=232.806
+BM_Enqueue_Latency_1_000_000/2/4096             228 ms          227 ms            3 QueueCapacity=4.096k Threads=2 Throughput_Mops=4.35288 ns_per_task=229.733
+BM_Enqueue_Latency_1_000_000/2/16384            229 ms          222 ms            3 QueueCapacity=16.384k Threads=2 Throughput_Mops=4.29509 ns_per_task=232.824
+BM_Enqueue_Latency_1_000_000/2/65536            231 ms          217 ms            3 QueueCapacity=65.536k Threads=2 Throughput_Mops=4.25256 ns_per_task=235.152
+BM_Enqueue_Latency_1_000_000/2/262144           230 ms          223 ms            3 QueueCapacity=262.144k Threads=2 Throughput_Mops=4.39835 ns_per_task=227.358
+BM_Enqueue_Latency_1_000_000/2/1048576          229 ms          227 ms            3 QueueCapacity=1.04858M Threads=2 Throughput_Mops=4.36756 ns_per_task=228.961
+BM_Enqueue_Latency_1_000_000/3/64               246 ms          246 ms            3 QueueCapacity=64 Threads=3 Throughput_Mops=4.14315 ns_per_task=241.362
+BM_Enqueue_Latency_1_000_000/3/512              244 ms          244 ms            3 QueueCapacity=512 Threads=3 Throughput_Mops=4.12625 ns_per_task=242.351
+BM_Enqueue_Latency_1_000_000/3/1024             243 ms          243 ms            3 QueueCapacity=1.024k Threads=3 Throughput_Mops=4.14863 ns_per_task=241.044
+BM_Enqueue_Latency_1_000_000/3/4096             241 ms          241 ms            3 QueueCapacity=4.096k Threads=3 Throughput_Mops=4.0885 ns_per_task=244.589
+BM_Enqueue_Latency_1_000_000/3/16384            242 ms          242 ms            3 QueueCapacity=16.384k Threads=3 Throughput_Mops=4.18164 ns_per_task=239.141
+BM_Enqueue_Latency_1_000_000/3/65536            245 ms          245 ms            3 QueueCapacity=65.536k Threads=3 Throughput_Mops=4.08944 ns_per_task=244.532
+BM_Enqueue_Latency_1_000_000/3/262144           246 ms          246 ms            3 QueueCapacity=262.144k Threads=3 Throughput_Mops=4.10785 ns_per_task=243.436
+BM_Enqueue_Latency_1_000_000/3/1048576          249 ms          249 ms            3 QueueCapacity=1.04858M Threads=3 Throughput_Mops=3.92919 ns_per_task=254.505
+BM_Enqueue_Latency_1_000_000/4/64               255 ms          255 ms            3 QueueCapacity=64 Threads=4 Throughput_Mops=3.8904 ns_per_task=257.043
+BM_Enqueue_Latency_1_000_000/4/512              255 ms          255 ms            3 QueueCapacity=512 Threads=4 Throughput_Mops=3.91084 ns_per_task=255.7
+BM_Enqueue_Latency_1_000_000/4/1024             255 ms          255 ms            3 QueueCapacity=1.024k Threads=4 Throughput_Mops=3.95062 ns_per_task=253.125
+BM_Enqueue_Latency_1_000_000/4/4096             255 ms          254 ms            3 QueueCapacity=4.096k Threads=4 Throughput_Mops=3.86561 ns_per_task=258.691
+BM_Enqueue_Latency_1_000_000/4/16384            254 ms          252 ms            3 QueueCapacity=16.384k Threads=4 Throughput_Mops=3.93252 ns_per_task=254.29
+BM_Enqueue_Latency_1_000_000/4/65536            253 ms          253 ms            3 QueueCapacity=65.536k Threads=4 Throughput_Mops=3.98498 ns_per_task=250.942
+BM_Enqueue_Latency_1_000_000/4/262144           262 ms          262 ms            3 QueueCapacity=262.144k Threads=4 Throughput_Mops=3.848 ns_per_task=259.875
+BM_Enqueue_Latency_1_000_000/4/1048576          260 ms          260 ms            3 QueueCapacity=1.04858M Threads=4 Throughput_Mops=3.87473 ns_per_task=258.082
+BM_Enqueue_Overhead_1_000_000/1/64             1433 ms         1432 ms            1 QueueCapacity=64 Threads=1 Throughput_Mops=0.698069 overhead_ns_per_task=432.524
+BM_Enqueue_Overhead_1_000_000/1/512            1424 ms         1423 ms            1 QueueCapacity=512 Threads=1 Throughput_Mops=0.702327 overhead_ns_per_task=423.839
+BM_Enqueue_Overhead_1_000_000/1/1024           1425 ms         1422 ms            1 QueueCapacity=1.024k Threads=1 Throughput_Mops=0.701896 overhead_ns_per_task=424.713
+BM_Enqueue_Overhead_1_000_000/1/4096           1414 ms         1407 ms            1 QueueCapacity=4.096k Threads=1 Throughput_Mops=0.70722 overhead_ns_per_task=413.988
+BM_Enqueue_Overhead_1_000_000/1/16384          1422 ms         1399 ms            1 QueueCapacity=16.384k Threads=1 Throughput_Mops=0.703207 overhead_ns_per_task=422.056
+BM_Enqueue_Overhead_1_000_000/1/65536          1415 ms         1303 ms            1 QueueCapacity=65.536k Threads=1 Throughput_Mops=0.70688 overhead_ns_per_task=414.666
+BM_Enqueue_Overhead_1_000_000/1/262144         1411 ms          790 ms            1 QueueCapacity=262.144k Threads=1 Throughput_Mops=0.708761 overhead_ns_per_task=410.912
+BM_Enqueue_Overhead_1_000_000/1/1048576        1420 ms          182 ms            4 QueueCapacity=1.04858M Threads=1 Throughput_Mops=0.707101 overhead_ns_per_task=414.225
+BM_Enqueue_Overhead_1_000_000/2/64              726 ms          726 ms            1 QueueCapacity=64 Threads=2 Throughput_Mops=1.37656 overhead_ns_per_task=226.446
+BM_Enqueue_Overhead_1_000_000/2/512             721 ms          721 ms            1 QueueCapacity=512 Threads=2 Throughput_Mops=1.3864 overhead_ns_per_task=221.294
+BM_Enqueue_Overhead_1_000_000/2/1024            718 ms          716 ms            1 QueueCapacity=1.024k Threads=2 Throughput_Mops=1.39342 overhead_ns_per_task=217.657
+BM_Enqueue_Overhead_1_000_000/2/4096            713 ms          709 ms            1 QueueCapacity=4.096k Threads=2 Throughput_Mops=1.40283 overhead_ns_per_task=212.844
+BM_Enqueue_Overhead_1_000_000/2/16384           713 ms          686 ms            1 QueueCapacity=16.384k Threads=2 Throughput_Mops=1.40321 overhead_ns_per_task=212.653
+BM_Enqueue_Overhead_1_000_000/2/65536           717 ms          590 ms            1 QueueCapacity=65.536k Threads=2 Throughput_Mops=1.39422 overhead_ns_per_task=217.245
+BM_Enqueue_Overhead_1_000_000/2/262144          722 ms          288 ms            2 QueueCapacity=262.144k Threads=2 Throughput_Mops=1.3885 overhead_ns_per_task=220.203
+BM_Enqueue_Overhead_1_000_000/2/1048576         723 ms          192 ms            4 QueueCapacity=1.04858M Threads=2 Throughput_Mops=1.38597 overhead_ns_per_task=221.518
+BM_Enqueue_Overhead_1_000_000/3/64              485 ms          485 ms            2 QueueCapacity=64 Threads=3 Throughput_Mops=2.05615 overhead_ns_per_task=153.345
+BM_Enqueue_Overhead_1_000_000/3/512             480 ms          480 ms            2 QueueCapacity=512 Threads=3 Throughput_Mops=2.08235 overhead_ns_per_task=147.227
+BM_Enqueue_Overhead_1_000_000/3/1024            480 ms          479 ms            2 QueueCapacity=1.024k Threads=3 Throughput_Mops=2.08844 overhead_ns_per_task=145.827
+BM_Enqueue_Overhead_1_000_000/3/4096            477 ms          471 ms            2 QueueCapacity=4.096k Threads=3 Throughput_Mops=2.09577 overhead_ns_per_task=144.152
+BM_Enqueue_Overhead_1_000_000/3/16384           476 ms          445 ms            2 QueueCapacity=16.384k Threads=3 Throughput_Mops=2.10279 overhead_ns_per_task=142.559
+BM_Enqueue_Overhead_1_000_000/3/65536           485 ms          373 ms            2 QueueCapacity=65.536k Threads=3 Throughput_Mops=2.0601 overhead_ns_per_task=152.414
+BM_Enqueue_Overhead_1_000_000/3/262144          486 ms          200 ms            3 QueueCapacity=262.144k Threads=3 Throughput_Mops=2.06615 overhead_ns_per_task=150.993
+BM_Enqueue_Overhead_1_000_000/3/1048576         487 ms          200 ms            4 QueueCapacity=1.04858M Threads=3 Throughput_Mops=2.06681 overhead_ns_per_task=150.837
+BM_Enqueue_Overhead_1_000_000/4/64              365 ms          365 ms            2 QueueCapacity=64 Threads=4 Throughput_Mops=2.73886 overhead_ns_per_task=115.115
+BM_Enqueue_Overhead_1_000_000/4/512             362 ms          362 ms            2 QueueCapacity=512 Threads=4 Throughput_Mops=2.76044 overhead_ns_per_task=112.261
+BM_Enqueue_Overhead_1_000_000/4/1024            360 ms          359 ms            2 QueueCapacity=1.024k Threads=4 Throughput_Mops=2.78432 overhead_ns_per_task=109.154
+BM_Enqueue_Overhead_1_000_000/4/4096            359 ms          354 ms            2 QueueCapacity=4.096k Threads=4 Throughput_Mops=2.78322 overhead_ns_per_task=109.296
+BM_Enqueue_Overhead_1_000_000/4/16384           391 ms          373 ms            2 QueueCapacity=16.384k Threads=4 Throughput_Mops=2.37427 overhead_ns_per_task=171.183
+BM_Enqueue_Overhead_1_000_000/4/65536           365 ms          262 ms            3 QueueCapacity=65.536k Threads=4 Throughput_Mops=2.74702 overhead_ns_per_task=114.031
+BM_Enqueue_Overhead_1_000_000/4/262144          366 ms          213 ms            3 QueueCapacity=262.144k Threads=4 Throughput_Mops=2.73267 overhead_ns_per_task=115.942
+BM_Enqueue_Overhead_1_000_000/4/1048576         366 ms          213 ms            3 QueueCapacity=1.04858M Threads=4 Throughput_Mops=2.73131 overhead_ns_per_task=116.125
+BM_Async_Latency_1_000_000/1/64                 682 ms          682 ms            1 QueueCapacity=64 Threads=1 Throughput_Mops=1.46675 ns_per_task=681.779
+BM_Async_Latency_1_000_000/1/512                649 ms          649 ms            1 QueueCapacity=512 Threads=1 Throughput_Mops=1.5404 ns_per_task=649.182
+BM_Async_Latency_1_000_000/1/1024               639 ms          638 ms            1 QueueCapacity=1.024k Threads=1 Throughput_Mops=1.56465 ns_per_task=639.122
+BM_Async_Latency_1_000_000/1/4096               629 ms          627 ms            1 QueueCapacity=4.096k Threads=1 Throughput_Mops=1.58907 ns_per_task=629.298
+BM_Async_Latency_1_000_000/1/16384              625 ms          614 ms            1 QueueCapacity=16.384k Threads=1 Throughput_Mops=1.599 ns_per_task=625.39
+BM_Async_Latency_1_000_000/1/65536              653 ms          601 ms            1 QueueCapacity=65.536k Threads=1 Throughput_Mops=1.53134 ns_per_task=653.024
+BM_Async_Latency_1_000_000/1/262144             644 ms          509 ms            1 QueueCapacity=262.144k Threads=1 Throughput_Mops=1.55256 ns_per_task=644.099
+BM_Async_Latency_1_000_000/1/1048576            642 ms          514 ms            1 QueueCapacity=1.04858M Threads=1 Throughput_Mops=1.55713 ns_per_task=642.208
+BM_Async_Latency_1_000_000/2/64                 553 ms          553 ms            1 QueueCapacity=64 Threads=2 Throughput_Mops=1.80706 ns_per_task=553.386
+BM_Async_Latency_1_000_000/2/512                552 ms          552 ms            1 QueueCapacity=512 Threads=2 Throughput_Mops=1.81043 ns_per_task=552.355
+BM_Async_Latency_1_000_000/2/1024               560 ms          560 ms            1 QueueCapacity=1.024k Threads=2 Throughput_Mops=1.78704 ns_per_task=559.586
+BM_Async_Latency_1_000_000/2/4096               551 ms          551 ms            1 QueueCapacity=4.096k Threads=2 Throughput_Mops=1.81541 ns_per_task=550.841
+BM_Async_Latency_1_000_000/2/16384              551 ms          551 ms            1 QueueCapacity=16.384k Threads=2 Throughput_Mops=1.81364 ns_per_task=551.379
+BM_Async_Latency_1_000_000/2/65536              553 ms          553 ms            1 QueueCapacity=65.536k Threads=2 Throughput_Mops=1.80687 ns_per_task=553.443
+BM_Async_Latency_1_000_000/2/262144             547 ms          547 ms            1 QueueCapacity=262.144k Threads=2 Throughput_Mops=1.82769 ns_per_task=547.139
+BM_Async_Latency_1_000_000/2/1048576            562 ms          562 ms            1 QueueCapacity=1.04858M Threads=2 Throughput_Mops=1.7805 ns_per_task=561.64
+BM_Async_Latency_1_000_000/3/64                 553 ms          553 ms            1 QueueCapacity=64 Threads=3 Throughput_Mops=1.8084 ns_per_task=552.976
+BM_Async_Latency_1_000_000/3/512                574 ms          574 ms            1 QueueCapacity=512 Threads=3 Throughput_Mops=1.74088 ns_per_task=574.421
+BM_Async_Latency_1_000_000/3/1024               544 ms          544 ms            1 QueueCapacity=1.024k Threads=3 Throughput_Mops=1.83735 ns_per_task=544.261
+BM_Async_Latency_1_000_000/3/4096               558 ms          558 ms            1 QueueCapacity=4.096k Threads=3 Throughput_Mops=1.79327 ns_per_task=557.639
+BM_Async_Latency_1_000_000/3/16384              556 ms          556 ms            1 QueueCapacity=16.384k Threads=3 Throughput_Mops=1.79962 ns_per_task=555.674
+BM_Async_Latency_1_000_000/3/65536              547 ms          547 ms            1 QueueCapacity=65.536k Threads=3 Throughput_Mops=1.82939 ns_per_task=546.63
+BM_Async_Latency_1_000_000/3/262144             551 ms          551 ms            1 QueueCapacity=262.144k Threads=3 Throughput_Mops=1.81465 ns_per_task=551.07
+BM_Async_Latency_1_000_000/3/1048576            554 ms          554 ms            1 QueueCapacity=1.04858M Threads=3 Throughput_Mops=1.80433 ns_per_task=554.221
+BM_Async_Latency_1_000_000/4/64                 553 ms          553 ms            1 QueueCapacity=64 Threads=4 Throughput_Mops=1.80803 ns_per_task=553.088
+BM_Async_Latency_1_000_000/4/512                579 ms          578 ms            1 QueueCapacity=512 Threads=4 Throughput_Mops=1.72819 ns_per_task=578.64
+BM_Async_Latency_1_000_000/4/1024               552 ms          551 ms            1 QueueCapacity=1.024k Threads=4 Throughput_Mops=1.81326 ns_per_task=551.493
+BM_Async_Latency_1_000_000/4/4096               548 ms          548 ms            1 QueueCapacity=4.096k Threads=4 Throughput_Mops=1.82562 ns_per_task=547.759
+BM_Async_Latency_1_000_000/4/16384              536 ms          536 ms            1 QueueCapacity=16.384k Threads=4 Throughput_Mops=1.86487 ns_per_task=536.23
+BM_Async_Latency_1_000_000/4/65536              551 ms          551 ms            1 QueueCapacity=65.536k Threads=4 Throughput_Mops=1.81338 ns_per_task=551.455
+BM_Async_Latency_1_000_000/4/262144             559 ms          558 ms            1 QueueCapacity=262.144k Threads=4 Throughput_Mops=1.79018 ns_per_task=558.603
+BM_Async_Latency_1_000_000/4/1048576            559 ms          559 ms            1 QueueCapacity=1.04858M Threads=4 Throughput_Mops=1.78884 ns_per_task=559.022
+BM_Async_Overhead_1_000_000/1/64               1671 ms         1670 ms            1 QueueCapacity=64 Threads=1 Throughput_Mops=0.598532 overhead_ns_per_task=670.755
+BM_Async_Overhead_1_000_000/1/512              1628 ms         1627 ms            1 QueueCapacity=512 Threads=1 Throughput_Mops=0.614208 overhead_ns_per_task=628.113
+BM_Async_Overhead_1_000_000/1/1024             1612 ms         1609 ms            1 QueueCapacity=1.024k Threads=1 Throughput_Mops=0.620371 overhead_ns_per_task=611.938
+BM_Async_Overhead_1_000_000/1/4096             1607 ms         1598 ms            1 QueueCapacity=4.096k Threads=1 Throughput_Mops=0.622416 overhead_ns_per_task=606.643
+BM_Async_Overhead_1_000_000/1/16384            1619 ms         1576 ms            1 QueueCapacity=16.384k Threads=1 Throughput_Mops=0.617589 overhead_ns_per_task=619.199
+BM_Async_Overhead_1_000_000/1/65536            1623 ms         1440 ms            1 QueueCapacity=65.536k Threads=1 Throughput_Mops=0.61627 overhead_ns_per_task=622.666
+BM_Async_Overhead_1_000_000/1/262144           1614 ms         1044 ms            1 QueueCapacity=262.144k Threads=1 Throughput_Mops=0.61954 overhead_ns_per_task=614.101
+BM_Async_Overhead_1_000_000/1/1048576          1625 ms          484 ms            2 QueueCapacity=1.04858M Threads=1 Throughput_Mops=0.615923 overhead_ns_per_task=623.581
+BM_Async_Overhead_1_000_000/2/64                851 ms          851 ms            1 QueueCapacity=64 Threads=2 Throughput_Mops=1.17456 overhead_ns_per_task=351.381
+BM_Async_Overhead_1_000_000/2/512               840 ms          840 ms            1 QueueCapacity=512 Threads=2 Throughput_Mops=1.1899 overhead_ns_per_task=340.408
+BM_Async_Overhead_1_000_000/2/1024              837 ms          835 ms            1 QueueCapacity=1.024k Threads=2 Throughput_Mops=1.19529 overhead_ns_per_task=336.615
+BM_Async_Overhead_1_000_000/2/4096              837 ms          831 ms            1 QueueCapacity=4.096k Threads=2 Throughput_Mops=1.19481 overhead_ns_per_task=336.951
+BM_Async_Overhead_1_000_000/2/16384             852 ms          820 ms            1 QueueCapacity=16.384k Threads=2 Throughput_Mops=1.17393 overhead_ns_per_task=351.838
+BM_Async_Overhead_1_000_000/2/65536             874 ms          741 ms            1 QueueCapacity=65.536k Threads=2 Throughput_Mops=1.14414 overhead_ns_per_task=374.022
+BM_Async_Overhead_1_000_000/2/262144            854 ms          509 ms            1 QueueCapacity=262.144k Threads=2 Throughput_Mops=1.17055 overhead_ns_per_task=354.296
+BM_Async_Overhead_1_000_000/2/1048576           859 ms          528 ms            1 QueueCapacity=1.04858M Threads=2 Throughput_Mops=1.16464 overhead_ns_per_task=358.632
+BM_Async_Overhead_1_000_000/3/64                573 ms          573 ms            1 QueueCapacity=64 Threads=3 Throughput_Mops=1.74375 overhead_ns_per_task=240.477
+BM_Async_Overhead_1_000_000/3/512               566 ms          565 ms            1 QueueCapacity=512 Threads=3 Throughput_Mops=1.76746 overhead_ns_per_task=232.785
+BM_Async_Overhead_1_000_000/3/1024              565 ms          564 ms            1 QueueCapacity=1.024k Threads=3 Throughput_Mops=1.77008 overhead_ns_per_task=231.945
+BM_Async_Overhead_1_000_000/3/4096              563 ms          557 ms            1 QueueCapacity=4.096k Threads=3 Throughput_Mops=1.77595 overhead_ns_per_task=230.078
+BM_Async_Overhead_1_000_000/3/16384             569 ms          542 ms            1 QueueCapacity=16.384k Threads=3 Throughput_Mops=1.75668 overhead_ns_per_task=236.257
+BM_Async_Overhead_1_000_000/3/65536             572 ms          531 ms            1 QueueCapacity=65.536k Threads=3 Throughput_Mops=1.74876 overhead_ns_per_task=238.834
+BM_Async_Overhead_1_000_000/3/262144            568 ms          537 ms            1 QueueCapacity=262.144k Threads=3 Throughput_Mops=1.76096 overhead_ns_per_task=234.872
+BM_Async_Overhead_1_000_000/3/1048576           566 ms          541 ms            1 QueueCapacity=1.04858M Threads=3 Throughput_Mops=1.76763 overhead_ns_per_task=232.73
+BM_Async_Overhead_1_000_000/4/64                542 ms          541 ms            1 QueueCapacity=64 Threads=4 Throughput_Mops=1.84652 overhead_ns_per_task=291.561
+BM_Async_Overhead_1_000_000/4/512               549 ms          549 ms            1 QueueCapacity=512 Threads=4 Throughput_Mops=1.82027 overhead_ns_per_task=299.369
+BM_Async_Overhead_1_000_000/4/1024              548 ms          548 ms            1 QueueCapacity=1.024k Threads=4 Throughput_Mops=1.82491 overhead_ns_per_task=297.972
+BM_Async_Overhead_1_000_000/4/4096              541 ms          541 ms            1 QueueCapacity=4.096k Threads=4 Throughput_Mops=1.84896 overhead_ns_per_task=290.846
+BM_Async_Overhead_1_000_000/4/16384             531 ms          531 ms            1 QueueCapacity=16.384k Threads=4 Throughput_Mops=1.88381 overhead_ns_per_task=280.838
+BM_Async_Overhead_1_000_000/4/65536             583 ms          538 ms            1 QueueCapacity=65.536k Threads=4 Throughput_Mops=1.71483 overhead_ns_per_task=333.15
+BM_Async_Overhead_1_000_000/4/262144            556 ms          556 ms            1 QueueCapacity=262.144k Threads=4 Throughput_Mops=1.79721 overhead_ns_per_task=306.418
+BM_Async_Overhead_1_000_000/4/1048576           552 ms          552 ms            1 QueueCapacity=1.04858M Threads=4 Throughput_Mops=1.81077 overhead_ns_per_task=302.251
+BM_Then_Chain_1_000_000/1/64                    791 ms          791 ms            1 ChainLength=1M QueueCapacity=64 Threads=1 Throughput_Mops=1.26479 Total_ns=790.645M ns_per_then=790.645
+BM_Then_Chain_1_000_000/1/512                   790 ms          790 ms            1 ChainLength=1M QueueCapacity=512 Threads=1 Throughput_Mops=1.26634 Total_ns=789.674M ns_per_then=789.674
+BM_Then_Chain_1_000_000/1/1024                  791 ms          791 ms            1 ChainLength=1M QueueCapacity=1.024k Threads=1 Throughput_Mops=1.26399 Total_ns=791.143M ns_per_then=791.143
+BM_Then_Chain_1_000_000/1/4096                  782 ms          782 ms            1 ChainLength=1M QueueCapacity=4.096k Threads=1 Throughput_Mops=1.27851 Total_ns=782.159M ns_per_then=782.159
+BM_Then_Chain_1_000_000/1/16384                 787 ms          787 ms            1 ChainLength=1M QueueCapacity=16.384k Threads=1 Throughput_Mops=1.27129 Total_ns=786.605M ns_per_then=786.605
+BM_Then_Chain_1_000_000/1/65536                 783 ms          783 ms            1 ChainLength=1M QueueCapacity=65.536k Threads=1 Throughput_Mops=1.27776 Total_ns=782.621M ns_per_then=782.621
+BM_Then_Chain_1_000_000/1/262144                782 ms          782 ms            1 ChainLength=1M QueueCapacity=262.144k Threads=1 Throughput_Mops=1.27916 Total_ns=781.762M ns_per_then=781.762
+BM_Then_Chain_1_000_000/1/1048576               780 ms          780 ms            1 ChainLength=1M QueueCapacity=1.04858M Threads=1 Throughput_Mops=1.2824 Total_ns=779.786M ns_per_then=779.786
+BM_Then_Chain_1_000_000/2/64                    745 ms          745 ms            1 ChainLength=1M QueueCapacity=64 Threads=2 Throughput_Mops=1.34282 Total_ns=744.703M ns_per_then=744.703
+BM_Then_Chain_1_000_000/2/512                   743 ms          743 ms            1 ChainLength=1M QueueCapacity=512 Threads=2 Throughput_Mops=1.34601 Total_ns=742.937M ns_per_then=742.937
+BM_Then_Chain_1_000_000/2/1024                  746 ms          746 ms            1 ChainLength=1M QueueCapacity=1.024k Threads=2 Throughput_Mops=1.3398 Total_ns=746.378M ns_per_then=746.378
+BM_Then_Chain_1_000_000/2/4096                  745 ms          745 ms            1 ChainLength=1M QueueCapacity=4.096k Threads=2 Throughput_Mops=1.34212 Total_ns=745.091M ns_per_then=745.091
+BM_Then_Chain_1_000_000/2/16384                 751 ms          751 ms            1 ChainLength=1M QueueCapacity=16.384k Threads=2 Throughput_Mops=1.33152 Total_ns=751.021M ns_per_then=751.021
+BM_Then_Chain_1_000_000/2/65536                 749 ms          749 ms            1 ChainLength=1M QueueCapacity=65.536k Threads=2 Throughput_Mops=1.33532 Total_ns=748.882M ns_per_then=748.882
+BM_Then_Chain_1_000_000/2/262144                748 ms          747 ms            1 ChainLength=1M QueueCapacity=262.144k Threads=2 Throughput_Mops=1.33765 Total_ns=747.581M ns_per_then=747.581
+BM_Then_Chain_1_000_000/2/1048576               742 ms          742 ms            1 ChainLength=1M QueueCapacity=1.04858M Threads=2 Throughput_Mops=1.34798 Total_ns=741.853M ns_per_then=741.853
+BM_Then_Chain_1_000_000/3/64                    749 ms          749 ms            1 ChainLength=1M QueueCapacity=64 Threads=3 Throughput_Mops=1.33428 Total_ns=749.466M ns_per_then=749.466
+BM_Then_Chain_1_000_000/3/512                   742 ms          742 ms            1 ChainLength=1M QueueCapacity=512 Threads=3 Throughput_Mops=1.34818 Total_ns=741.743M ns_per_then=741.743
+BM_Then_Chain_1_000_000/3/1024                  742 ms          742 ms            1 ChainLength=1M QueueCapacity=1.024k Threads=3 Throughput_Mops=1.34717 Total_ns=742.295M ns_per_then=742.295
+BM_Then_Chain_1_000_000/3/4096                  741 ms          741 ms            1 ChainLength=1M QueueCapacity=4.096k Threads=3 Throughput_Mops=1.34966 Total_ns=740.928M ns_per_then=740.928
+BM_Then_Chain_1_000_000/3/16384                 744 ms          744 ms            1 ChainLength=1M QueueCapacity=16.384k Threads=3 Throughput_Mops=1.34373 Total_ns=744.196M ns_per_then=744.196
+BM_Then_Chain_1_000_000/3/65536                 742 ms          742 ms            1 ChainLength=1M QueueCapacity=65.536k Threads=3 Throughput_Mops=1.34758 Total_ns=742.068M ns_per_then=742.068
+BM_Then_Chain_1_000_000/3/262144                737 ms          737 ms            1 ChainLength=1M QueueCapacity=262.144k Threads=3 Throughput_Mops=1.35751 Total_ns=736.645M ns_per_then=736.645
+BM_Then_Chain_1_000_000/3/1048576               739 ms          739 ms            1 ChainLength=1M QueueCapacity=1.04858M Threads=3 Throughput_Mops=1.3531 Total_ns=739.046M ns_per_then=739.046
+BM_Then_Chain_1_000_000/4/64                    744 ms          743 ms            1 ChainLength=1M QueueCapacity=64 Threads=4 Throughput_Mops=1.34491 Total_ns=743.544M ns_per_then=743.544
+BM_Then_Chain_1_000_000/4/512                   742 ms          742 ms            1 ChainLength=1M QueueCapacity=512 Threads=4 Throughput_Mops=1.34824 Total_ns=741.709M ns_per_then=741.709
+BM_Then_Chain_1_000_000/4/1024                  742 ms          742 ms            1 ChainLength=1M QueueCapacity=1.024k Threads=4 Throughput_Mops=1.34785 Total_ns=741.923M ns_per_then=741.923
+BM_Then_Chain_1_000_000/4/4096                  745 ms          745 ms            1 ChainLength=1M QueueCapacity=4.096k Threads=4 Throughput_Mops=1.34169 Total_ns=745.327M ns_per_then=745.327
+BM_Then_Chain_1_000_000/4/16384                 746 ms          746 ms            1 ChainLength=1M QueueCapacity=16.384k Threads=4 Throughput_Mops=1.34062 Total_ns=745.925M ns_per_then=745.925
+BM_Then_Chain_1_000_000/4/65536                 744 ms          743 ms            1 ChainLength=1M QueueCapacity=65.536k Threads=4 Throughput_Mops=1.34486 Total_ns=743.573M ns_per_then=743.573
+BM_Then_Chain_1_000_000/4/262144                737 ms          736 ms            1 ChainLength=1M QueueCapacity=262.144k Threads=4 Throughput_Mops=1.35773 Total_ns=736.526M ns_per_then=736.526
+BM_Then_Chain_1_000_000/4/1048576               732 ms          732 ms            1 ChainLength=1M QueueCapacity=1.04858M Threads=4 Throughput_Mops=1.36559 Total_ns=732.282M ns_per_then=732.282
+BM_Then_Registration_1_000_000/1/64             664 ms          664 ms            1 QueueCapacity=64 Threads=1 Throughput_Mops=1.5691 ns_per_then=637.308
+BM_Then_Registration_1_000_000/1/512            663 ms          663 ms            1 QueueCapacity=512 Threads=1 Throughput_Mops=1.56995 ns_per_then=636.964
+BM_Then_Registration_1_000_000/1/1024           663 ms          663 ms            1 QueueCapacity=1.024k Threads=1 Throughput_Mops=1.57019 ns_per_then=636.864
+BM_Then_Registration_1_000_000/1/4096           663 ms          663 ms            1 QueueCapacity=4.096k Threads=1 Throughput_Mops=1.56951 ns_per_then=637.143
+BM_Then_Registration_1_000_000/1/16384          663 ms          663 ms            1 QueueCapacity=16.384k Threads=1 Throughput_Mops=1.57051 ns_per_then=636.737
+BM_Then_Registration_1_000_000/1/65536          663 ms          663 ms            1 QueueCapacity=65.536k Threads=1 Throughput_Mops=1.57069 ns_per_then=636.662
+BM_Then_Registration_1_000_000/1/262144         665 ms          665 ms            1 QueueCapacity=262.144k Threads=1 Throughput_Mops=1.56448 ns_per_then=639.191
+BM_Then_Registration_1_000_000/1/1048576        663 ms          663 ms            1 QueueCapacity=1.04858M Threads=1 Throughput_Mops=1.56929 ns_per_then=637.229
+BM_Then_Registration_1_000_000/2/64             663 ms          663 ms            1 QueueCapacity=64 Threads=2 Throughput_Mops=1.57046 ns_per_then=636.755
+BM_Then_Registration_1_000_000/2/512            663 ms          663 ms            1 QueueCapacity=512 Threads=2 Throughput_Mops=1.57025 ns_per_then=636.841
+BM_Then_Registration_1_000_000/2/1024           663 ms          663 ms            1 QueueCapacity=1.024k Threads=2 Throughput_Mops=1.56922 ns_per_then=637.259
+BM_Then_Registration_1_000_000/2/4096           663 ms          663 ms            1 QueueCapacity=4.096k Threads=2 Throughput_Mops=1.56986 ns_per_then=636.999
+BM_Then_Registration_1_000_000/2/16384          663 ms          663 ms            1 QueueCapacity=16.384k Threads=2 Throughput_Mops=1.56976 ns_per_then=637.038
+BM_Then_Registration_1_000_000/2/65536          663 ms          663 ms            1 QueueCapacity=65.536k Threads=2 Throughput_Mops=1.56914 ns_per_then=637.29
+BM_Then_Registration_1_000_000/2/262144         663 ms          663 ms            1 QueueCapacity=262.144k Threads=2 Throughput_Mops=1.56906 ns_per_then=637.324
+BM_Then_Registration_1_000_000/2/1048576        663 ms          663 ms            1 QueueCapacity=1.04858M Threads=2 Throughput_Mops=1.5691 ns_per_then=637.307
+BM_Then_Registration_1_000_000/3/64             663 ms          663 ms            1 QueueCapacity=64 Threads=3 Throughput_Mops=1.56864 ns_per_then=637.494
+BM_Then_Registration_1_000_000/3/512            663 ms          663 ms            1 QueueCapacity=512 Threads=3 Throughput_Mops=1.56913 ns_per_then=637.298
+BM_Then_Registration_1_000_000/3/1024           662 ms          662 ms            1 QueueCapacity=1.024k Threads=3 Throughput_Mops=1.57067 ns_per_then=636.67
+BM_Then_Registration_1_000_000/3/4096           663 ms          663 ms            1 QueueCapacity=4.096k Threads=3 Throughput_Mops=1.56898 ns_per_then=637.358
+BM_Then_Registration_1_000_000/3/16384          663 ms          663 ms            1 QueueCapacity=16.384k Threads=3 Throughput_Mops=1.56939 ns_per_then=637.191
+BM_Then_Registration_1_000_000/3/65536          669 ms          666 ms            1 QueueCapacity=65.536k Threads=3 Throughput_Mops=1.55388 ns_per_then=643.549
+BM_Then_Registration_1_000_000/3/262144         663 ms          663 ms            1 QueueCapacity=262.144k Threads=3 Throughput_Mops=1.5697 ns_per_then=637.063
+BM_Then_Registration_1_000_000/3/1048576        664 ms          663 ms            1 QueueCapacity=1.04858M Threads=3 Throughput_Mops=1.56835 ns_per_then=637.612
+BM_Then_Registration_1_000_000/4/64             663 ms          663 ms            1 QueueCapacity=64 Threads=4 Throughput_Mops=1.56952 ns_per_then=637.136
+BM_Then_Registration_1_000_000/4/512            663 ms          663 ms            1 QueueCapacity=512 Threads=4 Throughput_Mops=1.57017 ns_per_then=636.876
+BM_Then_Registration_1_000_000/4/1024           663 ms          663 ms            1 QueueCapacity=1.024k Threads=4 Throughput_Mops=1.56847 ns_per_then=637.566
+BM_Then_Registration_1_000_000/4/4096           664 ms          664 ms            1 QueueCapacity=4.096k Threads=4 Throughput_Mops=1.56787 ns_per_then=637.81
+BM_Then_Registration_1_000_000/4/16384          671 ms          665 ms            1 QueueCapacity=16.384k Threads=4 Throughput_Mops=1.55025 ns_per_then=645.057
+BM_Then_Registration_1_000_000/4/65536          664 ms          663 ms            1 QueueCapacity=65.536k Threads=4 Throughput_Mops=1.56651 ns_per_then=638.362
+BM_Then_Registration_1_000_000/4/262144         664 ms          663 ms            1 QueueCapacity=262.144k Threads=4 Throughput_Mops=1.56749 ns_per_then=637.963
+BM_Then_Registration_1_000_000/4/1048576        663 ms          663 ms            1 QueueCapacity=1.04858M Threads=4 Throughput_Mops=1.56906 ns_per_then=637.322
+
+Process finished with exit code 0

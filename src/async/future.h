@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "concepts.h"
 #include "shared_state.h"
 #include "task.h"
 #include "utils.h"
@@ -99,7 +100,11 @@ namespace rts::async {
          * @return A new Future representing the result of `f`.
          */
         template<typename F>
-        auto then(F &&f) -> Future<std::invoke_result_t<F, T>> {
+        auto then(F&& f)
+            -> Future<std::invoke_result_t<F, T>>
+        requires std::invocable<F, T> && std::copy_constructible<std::decay_t<F>>
+        {
+
             assert(state_ && "then() called on invalid Future");
 
             using U = std::invoke_result_t<F, T>;
@@ -115,7 +120,7 @@ namespace rts::async {
 
                     assert(s->value.has_value() && "Continuation called before value was set");
 
-                    // Copy or move the stored value into the continuation.
+                    // Copy the stored value into the continuation.
                     auto val = s->value.value();
 
                     if constexpr (std::is_void_v<U>) {
@@ -142,7 +147,9 @@ namespace rts::async {
 
         // Forward declaration of void-specialized then()
         template<typename F>
-        Future<std::invoke_result_t<F>> then(F &&f);
+        auto then(F&& f)
+            -> Future<std::invoke_result_t<F>>
+        requires std::invocable<F> && std::copy_constructible<std::decay_t<F>>;
     };
 
 
@@ -152,7 +159,10 @@ namespace rts::async {
      */
     template<>
     template<typename F>
-    Future<std::invoke_result_t<F>> Future<void>::then(F &&f) {
+    auto Future<void>::then(F&& f)
+        -> Future<std::invoke_result_t<F>>
+    requires std::invocable<F> && std::copy_constructible<std::decay_t<F>>
+    {
         assert(state_ && "then() called on invalid Future<void>");
         using U = std::invoke_result_t<F>;
 
