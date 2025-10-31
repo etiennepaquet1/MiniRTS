@@ -1,6 +1,5 @@
+#pragma once
+
 #include "runtime.h"
-
-namespace rts::api {
-
-    inline
-}
+#include "promise.h"
+#include "future.h"

@@ -1,23 +1,19 @@
 cmake_minimum_required(VERSION 3.20)
-project(MiniRTS LANGUAGES CXX)
+project(MiniRTS LANGUAGES CXX VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Default build type
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose build type" FORCE)
-endif()
-
-# Common compile options
 add_compile_options(-Wno-interference-size)
 
-include(FetchContent)
+include(GNUInstallDirs)
 
-# ─────────────────────────────────────────────
-# Subdirectories
-# ─────────────────────────────────────────────
-add_subdirectory(src)
+add_subdirectory(src)    # defines MiniRTS first
+add_subdirectory(bench)  # then benchmarks
 add_subdirectory(test)
-add_subdirectory(bench)
+
+install(EXPORT MiniRTSTargets
+        FILE MiniRTSTargets.cmake
+        NAMESPACE MiniRTS::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MiniRTS
+)

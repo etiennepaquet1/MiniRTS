@@ -24,7 +24,7 @@ if(BUILD_TESTS)
     target_link_libraries(MiniRTS_tests
             PRIVATE
             gtest_main
-            Runtime
+            MiniRTS
     )
 
     include(GoogleTest)
