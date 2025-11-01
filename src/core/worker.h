@@ -59,7 +59,7 @@ namespace core {
         std::unique_ptr<WSQ> wsq_;                      ///< Local work-stealing queue.
         std::unique_ptr<SPSCQ> spscq_;                  ///< Single-producer, single-consumer submission queue.
         std::shared_ptr<std::atomic<int>> shutdown_requested_; ///< Shared shutdown flag.
-        std::shared_ptr<std::vector<Worker>> workers_vector_;  ///< Shared vector of all workers (for stealing).
+        std::weak_ptr<std::vector<Worker>> workers_vector_;  ///< Shared vector of all workers (for stealing).
         std::shared_ptr<std::atomic<int>> active_workers_;     ///< Tracks number of active workers.
         int core_affinity_;                             ///< Logical CPU core index for pinning.
 

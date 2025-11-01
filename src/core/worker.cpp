@@ -15,7 +15,11 @@ void core::Worker::run(size_t num_threads) noexcept {
         tls_worker = this;
 
         // Pointers to facilitate stealing from other workers
-        Worker* workers_begin {workers_vector_->data()};
+        auto workers_shared = workers_vector_.lock();
+        if (!workers_shared) {
+            return;
+        }
+        Worker* workers_begin = workers_shared->data();
         Worker* workers_end {workers_begin + num_threads};
         Worker* next_victim {workers_begin};
 

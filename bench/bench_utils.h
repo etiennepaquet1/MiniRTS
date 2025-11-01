@@ -1,5 +1,7 @@
 #pragma once
 
+#include <benchmark/benchmark.h>
+
 #if defined(_MSC_VER)
   #include <intrin.h>
   #define GET_CPUID(info, x) __cpuid(info, x)
@@ -39,4 +41,13 @@ inline int calibrate_busy_work(int target_ns = 1000) {
        << "Iterations per " << target_ns << " ns: " << iterations_per_target << "\n";
     }
     return iterations_per_target;
+}
+
+
+inline void register_args(benchmark::internal::Benchmark *b) {
+    for (int threads = 1; threads <= 4; threads += 2) {
+        for (int q = 6; q <= 20; q += 2) {  // 64 to 2^20
+            b->Args({threads, 1 << q});
+        }
+    }
 }

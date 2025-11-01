@@ -92,7 +92,7 @@ namespace rts
 
             // Bind enqueue function pointer
             core::enqueue_fn = [](Task&& task) noexcept {
-                assert(active_thread_pool && "No active thread pool set");
+                assert(core::active_thread_pool && "No active thread pool set");
                 assert(task && "Attempting to enqueue an empty task");
                 static_cast<T*>(core::active_thread_pool)->enqueue(std::move(task));
             };
@@ -137,7 +137,7 @@ namespace rts
      * @note Queued tasks are completed before shutdown.
      */
     inline void finalize_soft() noexcept {
-        assert(finalize_fn && "finalize_soft() called before initialization");
+        assert(core::finalize_fn && "finalize_soft() called before initialization");
         core::finalize_fn(core::SOFT_SHUTDOWN);
     }
 
@@ -152,8 +152,8 @@ namespace rts
      * @note This function dispatches via the pool-specific enqueue_fn set at initialization.
      */
     inline void enqueue(Task&& task) noexcept {
-        assert(running.load(std::memory_order_acquire) && "enqueue() called on inactive runtime");
-        assert(core:;enqueue_fn && "enqueue() called before initialization");
+        assert(core::running.load(std::memory_order_acquire) && "enqueue() called on inactive runtime");
+        assert(core::enqueue_fn && "enqueue() called before initialization");
         assert(task && "Attempting to enqueue an empty task");
         core::enqueue_fn(std::move(task));
     }
@@ -173,8 +173,8 @@ namespace rts
 
         using T = std::invoke_result_t<F, Args...>;
 
-        assert(running.load(std::memory_order_acquire) && "enqueue_async() called on inactive runtime");
-        assert(core:;enqueue_fn && "enqueue_async() called before initialization");
+        assert(core::running.load(std::memory_order_acquire) && "enqueue_async() called on inactive runtime");
+        assert(core::enqueue_fn && "enqueue_async() called before initialization");
 
         core::async::Promise<T> p;
         auto fut = p.get_future();

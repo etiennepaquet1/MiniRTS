@@ -12,6 +12,19 @@
 
 #include "api.h"
 
+
+int main() {
+    rts::initialize_runtime();
+
+    rts::enqueue([]{});
+
+    rts::finalize_soft();
+}
+
+
+
+
+/*
 int main() {
 
 
@@ -115,6 +128,7 @@ rts::finalize_soft();
 
     return 0;
 }
+*/
 
 
 
