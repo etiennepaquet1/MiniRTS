@@ -27,6 +27,11 @@ if(BUILD_TESTS)
             MiniRTS
     )
 
-    include(GoogleTest)
-    gtest_discover_tests(MiniRTS_tests)
+    if (ENABLE_TSAN OR ENABLE_ASAN OR ENABLE_MSAN)
+        message(STATUS "Sanitizer build: skipping gtest_discover_tests; registering binary as a single test")
+        add_test(NAME MiniRTS_tests COMMAND MiniRTS_tests)
+    else()
+        include(GoogleTest)
+        gtest_discover_tests(MiniRTS_tests)
+    endif()
 endif()

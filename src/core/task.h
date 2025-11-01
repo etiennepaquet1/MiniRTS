@@ -1,6 +1,6 @@
 /**
  * @file task.h
- * @brief Defines the Task type — a small, move-only, type-erased callable wrapper
+ * @brief Defines the Task type — a small, type-erased callable wrapper
  *        used by the RTS scheduler to represent units of executable work.
  *
  * Each Task stores:
@@ -9,7 +9,7 @@
  *   - and a function pointer to destroy it.
  *
  * The design avoids std::function overhead and allows non-throwing, type-erased
- * execution in hot paths. Tasks are move-only to prevent accidental double-deletes.
+ * execution in hot paths. Tasks cannot be move-only because Work-Stealing queues require copyable types.
  */
 
 #pragma once
@@ -19,7 +19,7 @@
 #include <utility>
 
 /**
- * @brief Represents a move-only, type-erased callable used by the runtime.
+ * @brief Represents a type-erased callable used by the runtime.
  *
  * A Task is the basic executable unit within the RTS. It holds a pointer
  * to a heap-allocated callable and the function pointers needed to
@@ -45,11 +45,11 @@ struct Task {
     /// @brief Default-constructed Task represents an empty/no-op task.
     Task() noexcept = default;
 
-    // Rule of five — Task is move-only to avoid double free.
+    // Rule of five.
 
-    Task(const Task&) = delete;
+    Task(const Task&) = default;
 
-    Task& operator=(const Task&) = delete;
+    Task& operator=(const Task&) = default;
 
     Task(Task&& other) noexcept = default;
 

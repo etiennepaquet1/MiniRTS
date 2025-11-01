@@ -97,11 +97,7 @@ namespace core::async {
             for (auto& cont : state_->continuations) {
                 assert(cont && "Continuation is invalid");
                 assert(tls_worker && "tls_worker must be set for local enqueue");
-                if (!tls_worker->enqueue_local(std::move(cont))) {
-                    // Local WSQ full → run immediately
-                    cont();
-                    cont.destroy();
-                }
+                tls_worker->enqueue_local(std::move(cont));
             }
         }
 
@@ -121,10 +117,7 @@ namespace core::async {
             for (auto& cont : state_->continuations) {
                 assert(cont && "Continuation is invalid");
                 assert(tls_worker && "tls_worker must be set for local enqueue");
-                if (!tls_worker->enqueue_local(std::move(cont))) {
-                    cont();
-                    cont.destroy();
-                }
+                tls_worker->enqueue_local(std::move(cont));
             }
         }
 

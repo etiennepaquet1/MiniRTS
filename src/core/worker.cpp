@@ -51,8 +51,7 @@ void core::Worker::run(size_t num_threads) noexcept {
                 for (int i = 0; i < victim_queue_size/2; i++) {
                 auto stolen_task = next_victim->steal();
                     if (stolen_task.has_value()) {
-                        bool result = enqueue_local(std::move(stolen_task.value()));
-                        assert(result);
+                        enqueue_local(std::move(stolen_task.value()));
                     } else {
                         break;
                     }
