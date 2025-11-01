@@ -8,6 +8,13 @@ add_compile_options(-Wno-interference-size)
 
 include(GNUInstallDirs)
 
+option(BUILD_TESTS "Build unit tests" ON)
+
+if (BUILD_TESTS)
+    include(CTest)
+    enable_testing()
+endif()
+
 # Sanitizer configuration
 option(ENABLE_ASAN "Enable AddressSanitizer and UBSan" OFF)
 option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
