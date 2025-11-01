@@ -33,8 +33,6 @@ namespace core {
      * of hardware threads on the system (e.g., logical CPU cores). Falls back to 1
      * if the standard thread library isn't available or `hardware_concurrency()` is not supported.
      */
-
-
 #if defined(_GLIBCXX_HAS_GTHREADS) || defined(_LIBCPP_HAS_THREAD_API_PTHREAD) || defined(_MSC_VER)
     inline const std::size_t kDefaultWorkerCount =
         [] {
