@@ -12,6 +12,7 @@
 #include <exception>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <thread>
 #include <tuple>
 #include <type_traits>
@@ -28,6 +29,7 @@ namespace core::async {
     class Promise;
 
     template <typename T>
+    requires concepts::FutureValue<T>
     class Future;
 }
 
@@ -56,7 +58,6 @@ namespace core {
 
 namespace rts
 {
-    using namespace core;
     // ─────────────────────────────────────────────────────────────
     // ────────────────  Runtime initialization API  ────────────────
     // ─────────────────────────────────────────────────────────────
@@ -72,33 +73,33 @@ namespace rts
      * @note This function allocates the runtime pool on the heap and binds
      *       function pointers for enqueueing and finalization.
      */
-    template <ThreadPool T = DefaultThreadPool>
+    template <core::ThreadPool T = core::DefaultThreadPool>
     bool initialize_runtime(size_t num_threads = std::thread::hardware_concurrency(),
-                            size_t queue_capacity = kDefaultCapacity) noexcept {
+                            size_t queue_capacity = core::kDefaultCapacity) noexcept {
         bool expected = false;
 
         // Ensure only one runtime instance is active at a time.
-        if (running.compare_exchange_strong(expected, true,
+        if (core::running.compare_exchange_strong(expected, true,
                                             std::memory_order_release,
                                             std::memory_order_relaxed)) {
-            assert(!active_thread_pool && "Runtime already has an active thread pool");
-            assert(!enqueue_fn && !finalize_fn && "Function pointers must be null before init");
+            assert(!core::active_thread_pool && "Runtime already has an active thread pool");
+            assert(!core::enqueue_fn && !core::finalize_fn && "Function pointers must be null before init");
 
             auto* pool = new T(num_threads, queue_capacity);
             pool->init();  // User-defined startup logic for the pool.
 
-            active_thread_pool = pool;
+            core::active_thread_pool = pool;
 
             // Bind enqueue function pointer
-            enqueue_fn = [](Task&& task) noexcept {
-                assert(active_thread_pool && "No active thread pool set");
+            core::enqueue_fn = [](Task&& task) noexcept {
+                assert(core::active_thread_pool && "No active thread pool set");
                 assert(task && "Attempting to enqueue an empty task");
-                static_cast<T*>(active_thread_pool)->enqueue(std::move(task));
+                static_cast<T*>(core::active_thread_pool)->enqueue(std::move(task));
             };
 
             // Bind finalize function pointer
-            finalize_fn = [](ShutdownMode mode) noexcept {
-                auto* p = static_cast<T*>(active_thread_pool);
+            core::finalize_fn = [](core::ShutdownMode mode) noexcept {
+                auto* p = static_cast<T*>(core::active_thread_pool);
                 if (!p) {
                     assert(false && "finalize_fn called with null thread pool");
                     return;
@@ -106,10 +107,10 @@ namespace rts
                 p->finalize(mode);
                 delete p;
 
-                active_thread_pool = nullptr;
-                enqueue_fn = nullptr;
-                finalize_fn = nullptr;
-                running.store(false, std::memory_order_release);
+                core::active_thread_pool = nullptr;
+                core::enqueue_fn = nullptr;
+                core::finalize_fn = nullptr;
+                core::running.store(false, std::memory_order_release);
             };
 
             return true;
@@ -127,8 +128,8 @@ namespace rts
      * @note Tasks currently running may be terminated abruptly.
      */
     inline void finalize_hard() noexcept {
-        assert(finalize_fn && "finalize_hard() called before initialization");
-        finalize_fn(HARD_SHUTDOWN);
+        assert(core::finalize_fn && "finalize_hard() called before initialization");
+        core::finalize_fn(core::HARD_SHUTDOWN);
     }
 
     /**
@@ -136,8 +137,8 @@ namespace rts
      * @note Queued tasks are completed before shutdown.
      */
     inline void finalize_soft() noexcept {
-        assert(finalize_fn && "finalize_soft() called before initialization");
-        finalize_fn(SOFT_SHUTDOWN);
+        assert(core::finalize_fn && "finalize_soft() called before initialization");
+        core::finalize_fn(core::SOFT_SHUTDOWN);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -151,10 +152,10 @@ namespace rts
      * @note This function dispatches via the pool-specific enqueue_fn set at initialization.
      */
     inline void enqueue(Task&& task) noexcept {
-        assert(running.load(std::memory_order_acquire) && "enqueue() called on inactive runtime");
-        assert(enqueue_fn && "enqueue() called before initialization");
+        assert(core::running.load(std::memory_order_acquire) && "enqueue() called on inactive runtime");
+        assert(core::enqueue_fn && "enqueue() called before initialization");
         assert(task && "Attempting to enqueue an empty task");
-        enqueue_fn(std::move(task));
+        core::enqueue_fn(std::move(task));
     }
 
     /**
@@ -168,14 +169,14 @@ namespace rts
      */
     template<typename F, typename... Args>
     auto async(F&& f, Args&&... args)
-        -> async::Future<std::invoke_result_t<F, Args...>> {
+        -> core::async::Future<std::invoke_result_t<F, Args...>> {
 
         using T = std::invoke_result_t<F, Args...>;
 
-        assert(running.load(std::memory_order_acquire) && "enqueue_async() called on inactive runtime");
-        assert(enqueue_fn && "enqueue_async() called before initialization");
+        assert(core::running.load(std::memory_order_acquire) && "enqueue_async() called on inactive runtime");
+        assert(core::enqueue_fn && "enqueue_async() called before initialization");
 
-        async::Promise<T> p;
+        core::async::Promise<T> p;
         auto fut = p.get_future();
 
         // Capture the promise by value (moved)
@@ -219,7 +220,7 @@ namespace rts
         using ResultTuple = std::tuple<typename std::decay_t<Futures>::value_type...>;
         using StateTuple  = std::tuple<std::optional<typename std::decay_t<Futures>::value_type>...>;
 
-        async::Promise<ResultTuple> prom;
+        core::async::Promise<ResultTuple> prom;
         auto out = prom.get_future();
 
         constexpr std::size_t N = sizeof...(Futures);
@@ -237,8 +238,8 @@ namespace rts
             assert(state && "State tuple null");
             if (remaining->fetch_sub(1, std::memory_order_acq_rel) == 1) {
                 auto result = std::apply(
-                    [](auto&... opts) -> ResultTuple {
-                        ((assert(opts.has_value() && "Missing value in when_all")), ...);
+                    []<typename... Ts>(std::optional<Ts>&... opts) -> ResultTuple {
+                        // ((assert(opts.has_value() && "Missing value in when_all")), ...);
                         return ResultTuple{ std::move(*opts)... };
                     },
                     *state

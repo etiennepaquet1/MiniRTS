@@ -22,7 +22,7 @@
 #include "utils.h"
 
 #include "SPSCQueue.h"
-#include "WorkStealingQueue.h"
+#include "deque.hpp"
 
 namespace core {
 
@@ -52,14 +52,14 @@ namespace core {
      * Thread-safe, non-copyable, and movable (to allow storage in std::vector).
      */
     class Worker {
-        using WSQ   = WorkStealingQueue<Task>;
+        using WSQ   = riften::Deque<Task>;
         using SPSCQ = rigtorp::SPSCQueue<Task>;
 
         std::thread thread_;                            ///< The thread executing this worker's main loop.
         std::unique_ptr<WSQ> wsq_;                      ///< Local work-stealing queue.
         std::unique_ptr<SPSCQ> spscq_;                  ///< Single-producer, single-consumer submission queue.
         std::shared_ptr<std::atomic<int>> shutdown_requested_; ///< Shared shutdown flag.
-        std::shared_ptr<std::vector<Worker>> workers_vector_;  ///< Shared vector of all workers (for stealing).
+        std::weak_ptr<std::vector<Worker>> workers_vector_;  ///< Shared vector of all workers (for stealing).
         std::shared_ptr<std::atomic<int>> active_workers_;     ///< Tracks number of active workers.
         int core_affinity_;                             ///< Logical CPU core index for pinning.
 
@@ -87,7 +87,7 @@ namespace core {
             assert(wsq_ && "Failed to allocate WSQ");
             assert(spscq_ && "Failed to allocate SPSCQ");
             assert(shutdown_requested_ && "Shutdown flag must not be null");
-            assert(workers_vector_ && "workers_vector_ must not be null");
+            assert(!workers_vector_.expired() && "workers_vector_ must not be null");
             assert(active_workers_ && "active_workers_ must not be null");
         }
 
@@ -165,11 +165,10 @@ namespace core {
          * @return True if the task was successfully enqueued.
          * @note Used internally by worker threads (e.g., for continuations).
          */
-        [[nodiscard]] bool enqueue_local(Task&& task) const noexcept {
+        void enqueue_local(Task&& task) const noexcept {
             assert(task && "Attempting to enqueue an empty Task");
             assert(wsq_ && "Work-stealing queue not initialized");
-            bool success = wsq_->try_emplace(std::move(task));
-            return success;
+            wsq_->emplace(std::move(task));
         }
     };
 

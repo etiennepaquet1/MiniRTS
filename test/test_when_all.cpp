@@ -11,7 +11,7 @@ TEST(ThreadPoolTests, TestWhenAll) {
     pin_to_core(5);
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+        rts::initialize_runtime(1, 64);
     }) << "initialize_runtime() should not throw.";
 
     core::async::Future<std::tuple<int>> tup = rts::when_all(

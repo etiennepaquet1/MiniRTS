@@ -14,7 +14,7 @@ TEST(ThreadPoolTests, TestReturnValue) {
     constexpr int LOOP {1'000'000};
 
     EXPECT_NO_THROW({
-        rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+        rts::initialize_runtime(1, 64);
     }) << "initialize_runtime() should not throw.";
 
     for (size_t i = 0; i < LOOP; ++i) {
@@ -29,7 +29,7 @@ TEST(ThreadPoolTests, TestReturnValue) {
 
 TEST(ThreadPoolTests, TestVoidThen) {
     pin_to_core(5);
-    rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    rts::initialize_runtime(1, 64);
 
     std::atomic<int> called = 0;
     rts::async([] {}).then([&] { called.fetch_add(1, std::memory_order_relaxed); });
@@ -40,7 +40,7 @@ TEST(ThreadPoolTests, TestVoidThen) {
 
 TEST(ThreadPoolTests, TestChainedThen) {
     pin_to_core(5);
-    rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    rts::initialize_runtime(1, 64);
 
     auto f = rts::async([] { return 2; })
         .then([](int x) { return x * 3; })
@@ -52,7 +52,7 @@ TEST(ThreadPoolTests, TestChainedThen) {
 
 TEST(ThreadPoolTests, TestExceptionPropagation) {
     pin_to_core(5);
-    rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    rts::initialize_runtime(1, 64);
 
     auto f = rts::async([]() -> int { throw std::runtime_error("boom"); return 0; })
         .then([](int) { FAIL() << "Continuation should not run"; });
@@ -64,7 +64,7 @@ TEST(ThreadPoolTests, TestExceptionPropagation) {
 
 TEST(ThreadPoolTests, TestExceptionInThen) {
     pin_to_core(5);
-    rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    rts::initialize_runtime(1, 64);
 
     auto f = rts::async([] { return 42; })
         .then([](int) -> int { throw std::logic_error("oops"); });
@@ -76,7 +76,7 @@ TEST(ThreadPoolTests, TestExceptionInThen) {
 
 TEST(ThreadPoolTests, TestThenOnReadyFuture) {
     pin_to_core(5);
-    rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    rts::initialize_runtime(1, 64);
 
     core::async::Promise<int> p;
     auto f = p.get_future();
@@ -92,7 +92,7 @@ TEST(ThreadPoolTests, TestThenOnReadyFuture) {
 
 TEST(ThreadPoolTests, TestLongChain) {
     pin_to_core(5);
-    rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    rts::initialize_runtime(1, 64);
 
     constexpr int N = 1'000'000;
     auto fut = rts::async([] { return 1; });
@@ -107,7 +107,7 @@ TEST(ThreadPoolTests, TestLongChain) {
 
 TEST(ThreadPoolTests, TestVoidChain) {
     pin_to_core(5);
-    rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    rts::initialize_runtime(1, 64);
 
     std::atomic<int> called = 0;
     rts::async([] {})
@@ -120,7 +120,7 @@ TEST(ThreadPoolTests, TestVoidChain) {
 
 TEST(ThreadPoolTests, TestMultipleThenOnSameFuture) {
     pin_to_core(5);
-    rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
+    rts::initialize_runtime(1, 64);
 
     auto f = rts::async([] { return 10; });
     std::atomic<int> c1 = 0, c2 = 0;

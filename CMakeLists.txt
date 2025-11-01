@@ -1,109 +1,50 @@
 cmake_minimum_required(VERSION 3.20)
-project(MiniRTS LANGUAGES CXX)
+project(MiniRTS LANGUAGES CXX VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_BUILD_TYPE Debug)
-
-# For GCC and Clang
 add_compile_options(-Wno-interference-size)
 
-include(FetchContent)
+include(GNUInstallDirs)
 
-# ─────────────────────────────────────────────
-# Core library
-# ─────────────────────────────────────────────
-add_library(Runtime
-        src/core/worker.cpp
-)
+# Sanitizer configuration
+option(ENABLE_ASAN "Enable AddressSanitizer and UBSan" OFF)
+option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
+option(ENABLE_MSAN "Enable MemorySanitizer" OFF)
 
-target_include_directories(Runtime
-        PUBLIC
-        ${CMAKE_SOURCE_DIR}/src/core
-        ${CMAKE_SOURCE_DIR}/src/async
-        ${CMAKE_SOURCE_DIR}/external
-        ${CMAKE_SOURCE_DIR}/external/WorkStealingQueue/include
-        ${CMAKE_SOURCE_DIR}/external/SPSCQueue/include/rigtorp
-)
+if(ENABLE_ASAN)
+    message(STATUS "Building with AddressSanitizer + UndefinedBehaviorSanitizer")
+    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer -g)
+    add_link_options(-fsanitize=address,undefined)
+elseif(ENABLE_TSAN)
+    message(STATUS "Building with ThreadSanitizer")
+    add_compile_options(-fsanitize=thread -fno-omit-frame-pointer -g)
+    add_link_options(-fsanitize=thread)
+elseif(ENABLE_MSAN)
+    message(STATUS "Building with MemorySanitizer")
+    add_compile_options(-fsanitize=memory -fno-omit-frame-pointer -g)
+    add_link_options(-fsanitize=memory)
+endif()
 
-add_library(Bench INTERFACE
-        src/api/api.h)
-target_include_directories(Bench INTERFACE ${CMAKE_SOURCE_DIR}/bench)
+if (ENABLE_TSAN)
+    set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)  # Disable LTO policy override
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
+endif()
 
-
-
-# ─────────────────────────────────────────────
-# GoogleTest
-# ─────────────────────────────────────────────
-option(BUILD_TESTS "Build unit tests" ON)
-
-if(BUILD_TESTS)
-    FetchContent_Declare(
-            googletest
-            URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
-            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-
-    enable_testing()
-
-    add_executable(MiniRTS_tests
-            test/test_runtime.cpp
-            test/test_future.cpp
-            test/test_when_all.cpp
-    )
-
-    target_link_libraries(MiniRTS_tests
-            PRIVATE
-            gtest_main
-            Runtime
-    )
-
-    include(GoogleTest)
-    gtest_discover_tests(MiniRTS_tests)
+if (ENABLE_TSAN)
+    add_compile_options(-fsanitize=thread -fno-omit-frame-pointer -O1 -fno-lto -fno-fat-lto-objects)
+    add_link_options(-fsanitize=thread -fno-lto -fno-fat-lto-objects)
 endif()
 
 
-# ─────────────────────────────────────────────
-# Google Benchmark
-# ─────────────────────────────────────────────
-option(BUILD_BENCHMARKS "Build performance benchmarks" ON)
+add_subdirectory(src)
+add_subdirectory(bench)
+add_subdirectory(test)
+add_subdirectory(example)
 
-if(BUILD_BENCHMARKS)
-    # Download Google Benchmark
-    FetchContent_Declare(
-            benchmark
-            URL https://github.com/google/benchmark/archive/refs/tags/v1.9.0.zip
-            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-
-    # Force benchmark to build in Release mode, even if the main project is Debug
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-    set(BENCHMARK_ENABLE_LTO ON CACHE BOOL "" FORCE)
-    set(CMAKE_BUILD_TYPE_BENCHMARK Release CACHE STRING "Build type for benchmark" FORCE)
-
-    # Trick: temporarily override the build type for this subproject only
-    set(_OLD_BUILD_TYPE ${CMAKE_BUILD_TYPE})
-    set(CMAKE_BUILD_TYPE Release)
-    FetchContent_MakeAvailable(benchmark)
-    set(CMAKE_BUILD_TYPE ${_OLD_BUILD_TYPE})
-
-    # Now build your benchmark executable
-    add_executable(MiniRTS_bench
-            bench/bench.cpp
-    )
-
-    target_include_directories(MiniRTS_bench
-            PRIVATE
-            ${CMAKE_SOURCE_DIR}/bench
-    )
-
-    target_link_libraries(MiniRTS_bench
-            PRIVATE
-            benchmark::benchmark
-            Runtime
-            Bench
-    )
-endif()
+install(EXPORT MiniRTSTargets
+        FILE MiniRTSTargets.cmake
+        NAMESPACE MiniRTS::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MiniRTS
+)
