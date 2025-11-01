@@ -29,7 +29,7 @@
 namespace core {
 
     /**
-     * @brief The default thread pool used by the RTS runtime system.
+     * @brief The default thread pool used by MiniRTS.
      *
      * This pool owns and manages a fixed number of Worker threads.
      * Each Worker maintains its own work-stealing queue, and tasks are
@@ -46,7 +46,6 @@ namespace core {
         std::shared_ptr<std::atomic<int>> active_workers_;      ///< Count of currently active workers.
         int round_robin_;                                       ///< Index for round-robin scheduling.
         size_t queue_capacity_;                                 ///< Per-worker queue capacity.
-
 
 
     public:
@@ -70,7 +69,7 @@ namespace core {
         }
 
         /**
-         * @brief Disable copy and move semantics — thread pools cannot be safely duplicated or transferred.
+         * @brief Disable copy and move semantics. Thread pools cannot be safely duplicated or transferred.
          */
         DefaultThreadPool(const DefaultThreadPool&) = delete;             ///< Non-copyable
         DefaultThreadPool& operator=(const DefaultThreadPool&) = delete;  ///< Non-copy-assignable

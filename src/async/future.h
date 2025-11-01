@@ -37,6 +37,7 @@ namespace core::async {
      * @tparam T The type of value produced by the associated Promise.
      */
     template<typename T>
+    requires concepts::FutureValue<T>
     class Future {
         std::shared_ptr<SharedState<T>> state_;
 
@@ -80,7 +81,7 @@ namespace core::async {
                 return;
             } else {
                 assert(state_->value.has_value() && "Future::get() called but no value set");
-                return std::move(*state_->value);
+                return *state_->value;
             }
         }
 
