@@ -13,6 +13,7 @@ target_include_directories(MiniRTS
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/core>
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/async>
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/ConcurrentDeque/include>
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/ConcurrentDeque/include/riften>
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/SPSCQueue/include/rigtorp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
