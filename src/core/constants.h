@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cstddef>
+#include <thread>
 
 namespace core {
 
@@ -32,11 +33,18 @@ namespace core {
      * of hardware threads on the system (e.g., logical CPU cores). Falls back to 1
      * if the standard thread library isn't available or `hardware_concurrency()` is not supported.
      */
-#ifdef __cpp_lib_thread
-    inline constexpr size_t kDefaultWorkerCount = std::thread::hardware_concurrency();
+
+
+#if defined(_GLIBCXX_HAS_GTHREADS) || defined(_LIBCPP_HAS_THREAD_API_PTHREAD) || defined(_MSC_VER)
+    inline const std::size_t kDefaultWorkerCount =
+        [] {
+            const unsigned n = std::thread::hardware_concurrency();
+            return n ? static_cast<std::size_t>(n) : 1u;
+    }();
 #else
-    inline constexpr size_t kDefaultWorkerCount = 1;
+    inline constexpr std::size_t kDefaultWorkerCount = 1;
 #endif
+
     /**
      * @brief Default capacity for internal task or queue buffers.
      */
