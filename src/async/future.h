@@ -8,7 +8,6 @@
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <syncstream>
 #include <type_traits>
 #include <utility>
 

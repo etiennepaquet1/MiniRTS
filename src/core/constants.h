@@ -24,6 +24,19 @@ namespace core {
     inline constexpr size_t kCacheLine = 64;
 #endif
 
+
+    /**
+     * @brief Default number of worker threads in the runtime system.
+     *
+     * Uses `std::thread::hardware_concurrency()` when available to query the number
+     * of hardware threads on the system (e.g., logical CPU cores). Falls back to 1
+     * if the standard thread library isn't available or `hardware_concurrency()` is not supported.
+     */
+#ifdef __cpp_lib_thread
+    inline constexpr size_t kDefaultWorkerCount = std::thread::hardware_concurrency();
+#else
+    inline constexpr size_t kDefaultWorkerCount = 1;
+#endif
     /**
      * @brief Default capacity for internal task or queue buffers.
      */
