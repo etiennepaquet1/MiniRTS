@@ -199,4 +199,69 @@ namespace rts
         enqueue(std::move(task));
         return fut;
     }
+
+    // ─────────────────────────────────────────────────────────────
+    // ────────────────────────  when_all()  ───────────────────────
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * @brief Combines multiple futures into one future that resolves
+     *        when all input futures have completed successfully.
+     *
+     * @tparam Futures Variadic pack of async::Future<T> types.
+     * @param futures The input futures to wait on.
+     * @return async::Future<std::tuple<...>> containing all results.
+     *
+     * @note This overload does not yet handle Future<void> types.
+     *       Use the specialized version (TODO) when available.
+     */
+    template <typename... Futures>
+    auto when_all(Futures&&... futures) {
+        using ResultTuple = std::tuple<typename std::decay_t<Futures>::value_type...>;
+        using StateTuple  = std::tuple<std::optional<typename std::decay_t<Futures>::value_type>...>;
+
+        core::async::Promise<ResultTuple> prom;
+        auto out = prom.get_future();
+
+        constexpr std::size_t N = sizeof...(Futures);
+        if constexpr (N == 0) {
+            prom.set_value(ResultTuple{});
+            return out;
+        }
+
+        auto state     = std::make_shared<StateTuple>();
+        auto remaining = std::make_shared<std::atomic<std::size_t>>(N);
+
+        // Called after each future completes; builds result tuple when last finishes.
+        auto fulfill = [prom = std::move(prom), state, remaining]() mutable {
+            assert(remaining && "Remaining counter null");
+            assert(state && "State tuple null");
+            if (remaining->fetch_sub(1, std::memory_order_acq_rel) == 1) {
+                auto result = std::apply(
+                    []<typename... Ts>(std::optional<Ts>&... opts) -> ResultTuple {
+                        return ResultTuple{ std::move(*opts)... };
+                    },
+                    *state
+                );
+                prom.set_value(std::move(result));
+            }
+        };
+
+        // Attach continuations per input future.
+        auto attach_one = [state, fulfill](auto& fut, [[maybe_unused]] auto index_c) {
+            constexpr std::size_t I = decltype(index_c)::value;
+            fut.then([state, fulfill](auto&& v) mutable {
+                std::get<I>(*state).emplace(std::forward<decltype(v)>(v));
+                fulfill();
+            });
+        };
+
+        // Generate indices [0..N) and attach
+        [&]<std::size_t... Is>(std::index_sequence<Is...>) {
+            (attach_one(futures, std::integral_constant<std::size_t, Is>{}), ...);
+        }(std::index_sequence_for<Futures...>{});
+
+        return out;
+    }
+
 } // namespace rts
