@@ -147,11 +147,9 @@ namespace core::async {
 
         // Forward declaration of void-specialized then()
         template<typename F>
-        auto then(F &&f)
-            -> Future<std::invoke_result_t<F> > requires
-            std::is_void_v<T> &&
-            std::invocable<F> &&
-            std::copy_constructible<std::decay_t<F> >;
+        auto then(F&& f)
+            -> Future<std::invoke_result_t<F>>
+        requires std::invocable<F> && std::copy_constructible<std::decay_t<F>>;
     };
 
 
@@ -161,11 +159,9 @@ namespace core::async {
      */
     template<>
     template<typename F>
-    auto Future<void>::then(F &&f)
-        -> Future<std::invoke_result_t<F> > requires
-        std::is_void_v<void> &&
-        std::invocable<F> &&
-        std::copy_constructible<std::decay_t<F> >
+    auto Future<void>::then(F&& f)
+        -> Future<std::invoke_result_t<F>>
+    requires std::invocable<F> && std::copy_constructible<std::decay_t<F>>
     {
         assert(state_ && "then() called on invalid Future<void>");
         using U = std::invoke_result_t<F>;
