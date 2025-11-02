@@ -46,4 +46,4 @@ namespace core::async {
         std::vector<Task> continuations;
     };
 
-} // namespace rts::async
+} // namespace core::async

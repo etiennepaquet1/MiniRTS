@@ -12,7 +12,7 @@
 
 // Measures the latency of enqueuing 1 million empty tasks with enqueue()
 // (e.g. the time between enqueuing the first task and finishing the final task.)
-static void BM_Enqueue_Latency_1_000_000(benchmark::State &state) {
+static void BM_Enqueue_Throughput_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
     const auto num_threads    = static_cast<size_t>(state.range(0));
@@ -49,7 +49,7 @@ static void BM_Enqueue_Latency_1_000_000(benchmark::State &state) {
 }
 
 // Register combinations of (num_threads, queue_capacity)
-BENCHMARK(BM_Enqueue_Latency_1_000_000)
+BENCHMARK(BM_Enqueue_Throughput_1_000_000)
     ->Apply(register_args)
     ->Unit(benchmark::kMillisecond);
 
@@ -117,7 +117,7 @@ BENCHMARK(BM_Enqueue_Overhead_1_000_000)
 
 // Measures the latency of enqueuing 1 million empty tasks with async()
 // (e.g. the time between enqueuing the first task and finishing the final task.)
-static void BM_Async_Latency_1_000_000(benchmark::State &state) {
+static void BM_Async_Throughput_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
     const auto num_threads    = static_cast<size_t>(state.range(0));
@@ -151,9 +151,105 @@ static void BM_Async_Latency_1_000_000(benchmark::State &state) {
 }
 
 // Register combinations of (num_threads, queue_capacity)
-BENCHMARK(BM_Async_Latency_1_000_000)
+BENCHMARK(BM_Async_Throughput_1_000_000)
     ->Apply(register_args)
     ->Unit(benchmark::kMillisecond);
+
+
+// Measures the latency of enqueuing 1 empty task with enqueue()
+// (e.g. the time between enqueuing the task and finishing it.)
+static void BM_Enqueue_Latency_Single_Task(benchmark::State &state) {
+    pin_to_core(5);
+
+    const auto num_threads    = static_cast<size_t>(state.range(0));
+    const auto queue_capacity = static_cast<size_t>(state.range(1));
+    constexpr int LOOP = 1'000'000;
+
+    for (auto _ : state) {
+        state.PauseTiming();
+        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+        state.ResumeTiming();
+
+        double total_ns = 0.0;
+
+        for (int i = 0; i < LOOP; ++i) {
+            std::atomic<int> flag{0};
+
+            const auto start = std::chrono::steady_clock::now();
+            rts::enqueue([&flag] {
+                flag.store(1, std::memory_order_release);
+            });
+
+            while (!flag.load(std::memory_order_acquire)) {}
+            const auto end = std::chrono::steady_clock::now();
+            total_ns += std::chrono::duration<double, std::nano>(end - start).count();
+        }
+
+        state.PauseTiming();
+        rts::finalize_soft();
+        state.ResumeTiming();
+
+        const double avg_ns = total_ns / LOOP;
+
+        state.counters["Threads"]         = static_cast<double>(num_threads);
+        state.counters["QueueCapacity"]   = static_cast<double>(queue_capacity);
+        state.counters["avg_latency"]     = avg_ns;
+    }
+}
+
+// Register combinations of (num_threads, queue_capacity)
+BENCHMARK(BM_Enqueue_Latency_Single_Task)
+    ->Apply(register_args)
+    ->Unit(benchmark::kMillisecond);
+
+// Measures the latency of enqueuing 1 empty task with enqueue_async()
+// (e.g. the time between enqueuing the task and finishing it.)
+static void BM_Async_Latency_Single_Task(benchmark::State &state) {
+    pin_to_core(5);
+
+    const auto num_threads    = static_cast<size_t>(state.range(0));
+    const auto queue_capacity = static_cast<size_t>(state.range(1));
+    constexpr int LOOP = 1'000'000;
+
+    for (auto _ : state) {
+        state.PauseTiming();
+
+        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+
+        state.ResumeTiming();
+
+        double total_ns = 0.0;
+
+        for (int i = 0; i < LOOP; ++i) {
+            std::atomic<int> flag{0};
+
+            const auto start = std::chrono::steady_clock::now();
+            rts::enqueue([&flag] {
+                flag.store(1, std::memory_order_release);
+            });
+
+            while (!flag.load(std::memory_order_acquire)) {}
+            const auto end = std::chrono::steady_clock::now();
+            total_ns += std::chrono::duration<double, std::nano>(end - start).count();
+        }
+
+        state.PauseTiming();
+        rts::finalize_soft();
+        state.ResumeTiming();
+
+        const double avg_ns = total_ns / LOOP;
+
+        state.counters["Threads"]         = static_cast<double>(num_threads);
+        state.counters["QueueCapacity"]   = static_cast<double>(queue_capacity);
+        state.counters["avg_latency"]     = avg_ns;
+    }
+}
+
+// Register combinations of (num_threads, queue_capacity)
+BENCHMARK(BM_Async_Latency_Single_Task)
+    ->Apply(register_args)
+    ->Unit(benchmark::kMillisecond);
+
 
 // Measures the overhead of enqueuing 1 million small wait tasks with async()
 // (e.g. the time between enqueuing the first task and finishing the final task

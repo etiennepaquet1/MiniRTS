@@ -12,7 +12,6 @@
 #include <iostream>
 #include <memory>
 #include <optional>
-#include <syncstream>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -172,4 +171,4 @@ namespace core {
         }
     };
 
-} // namespace rts
+} // namespace core

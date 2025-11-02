@@ -74,7 +74,7 @@ namespace rts
      *       function pointers for enqueueing and finalization.
      */
     template <core::ThreadPool T = core::DefaultThreadPool>
-    bool initialize_runtime(size_t num_threads = std::thread::hardware_concurrency(),
+    bool initialize_runtime(size_t num_threads = core::kDefaultWorkerCount,
                             size_t queue_capacity = core::kDefaultCapacity) noexcept {
         bool expected = false;
 
@@ -239,7 +239,6 @@ namespace rts
             if (remaining->fetch_sub(1, std::memory_order_acq_rel) == 1) {
                 auto result = std::apply(
                     []<typename... Ts>(std::optional<Ts>&... opts) -> ResultTuple {
-                        // ((assert(opts.has_value() && "Missing value in when_all")), ...);
                         return ResultTuple{ std::move(*opts)... };
                     },
                     *state

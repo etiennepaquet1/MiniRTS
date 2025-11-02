@@ -18,7 +18,6 @@
 #include <thread>
 #include <utility>
 #include <vector>
-#include <syncstream>
 
 #include "constants.h"
 #include "task.h"
@@ -55,7 +54,7 @@ namespace core {
          * @param queue_capacity Capacity for each worker’s local queue.
          */
         explicit DefaultThreadPool(
-            size_t num_threads = std::max(std::thread::hardware_concurrency(), 1u),
+            size_t num_threads = kDefaultWorkerCount,
             size_t queue_capacity = kDefaultCapacity) noexcept
             : workers_(std::make_shared<std::vector<Worker>>()),
               num_threads_(num_threads),
@@ -171,4 +170,4 @@ namespace core {
 
     static_assert(ThreadPool<DefaultThreadPool>,
                   "DefaultThreadPool must satisfy the ThreadPool concept");
-} // namespace rts
+} // namespace core
