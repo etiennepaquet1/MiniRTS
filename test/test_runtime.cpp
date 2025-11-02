@@ -84,7 +84,7 @@ TEST(ThreadPoolTests, TestWorkStealing){
         rts::enqueue([i]{std::cout << i << std::endl;});
         rts::enqueue([i] {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            std::osyncstream(std::cout) << "---" << i << std::endl;
+            debug_print() << "---" << i << std::endl;
         });
     }
 
