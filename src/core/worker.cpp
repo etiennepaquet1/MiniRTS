@@ -69,11 +69,9 @@ void core::Worker::run(size_t num_threads) noexcept {
                     break;
             }
         }
-        if constexpr (DEBUG) {
-            std::osyncstream(std::cout) << "[Exit]: Thread " << core_affinity_ << std::endl
-               << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl
-               << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl;
-        }
+        debug_print() << "[Exit]: Thread " << core_affinity_ << std::endl
+           << "[Exit]: Items left in WSQ: " << wsq_->size() << std::endl
+           << "[Exit]: Items left in MPMCQ: " << spscq_->size() << std::endl;
     });
 }
 

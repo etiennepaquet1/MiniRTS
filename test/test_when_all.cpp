@@ -34,11 +34,11 @@ TEST(ThreadPoolTests, TestWhenAll) {
 //
 //     auto tup = rts::when_all(
 //         rts::async([] {
-//             debug_print("1");
+//             debug_print() << "1";
 //         })
 //     );
 //
-//     tup.then([]{ debug_print("2"); });
+//     tup.then([]{ debug_print() << "2"; });
 //
 //     EXPECT_NO_THROW({
 //         rts::finalize_soft();

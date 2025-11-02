@@ -172,4 +172,4 @@ namespace core {
         }
     };
 
-} // namespace rts
+} // namespace core
