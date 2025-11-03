@@ -250,6 +250,59 @@ This diagram shows the internal design of each worker thread in the MiniRTS runt
 
 -----
 
+---
+
+## Using MiniRTS as a Git Submodule
+
+You can integrate **MiniRTS** directly into your CMake-based project by adding it as a Git submodule.
+
+### 1. Add MiniRTS as a Submodule
+
+Run the following command in the root of your project's repository:
+
+```bash
+git submodule add https://github.com/etiennepaquet1/MiniRTS external/MiniRTS
+git submodule update --init --recursive
+```
+
+This clones MiniRTS into the `external/MiniRTS` directory of your project.
+
+---
+
+### 2. Add MiniRTS to Your `CMakeLists.txt`
+
+In your main `CMakeLists.txt`, use CMake's `add_subdirectory()` to include MiniRTS and link it to your target:
+
+```cmake
+# Add MiniRTS submodule
+add_subdirectory(external/MiniRTS)
+
+# Link MiniRTS to your project executable or library
+target_link_libraries(MyExecutable PRIVATE MiniRTS::Runtime)
+```
+
+The `MiniRTS::Runtime` target provides access to the core runtime library.
+
+---
+
+### 3. Include MiniRTS API in Your Code
+
+Once linked, you can include and use MiniRTS like this:
+
+```cpp
+#include <MiniRTS/src/api/api.h>
+
+int main() {
+    rts::initialize_runtime();
+    rts::enqueue([] { std::cout << "Hello from MiniRTS!" << std::endl; });
+    rts::finalize_soft();
+}
+```
+
+---
+
+-----
+
 ## What's Next? (Roadmap)
 
 In the near future, I aim to introduce a few new features that could help performance and ease of use:
