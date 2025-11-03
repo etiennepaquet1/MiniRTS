@@ -6,7 +6,7 @@ A work-stealing task scheduling library designed for fine-grained, latency-sensi
 
 MiniRTS is a performance-oriented **C++23** task runtime that implements a lightweight work-stealing scheduler and a continuation-based async framework. It allows developers to launch millions of fine-grained tasks with **sub-microsecond scheduling overhead**, using a per-core work-stealing deque design inspired by research runtimes like libfork and HPX.
 
-The runtime provides **Future/Promise** primitives with support for continuation chaining (`then()`) and composition (`when_all() / when_any()`). MiniRTS is designed for applications where scheduling overhead and latency must be minimized. It uses **NUMA-friendly** work-stealing by keeping continuations local to their producing worker, minimizing cross-core contention.
+The runtime provides **Future/Promise** primitives with support for continuation chaining (`then()`) and composition (`when_all() / when_any()`). MiniRTS is designed for applications where scheduling overhead and latency must be minimized. It uses NUMA-friendly work-stealing by keeping continuations local to their producing worker, minimizing cross-core contention.
 
 MiniRTS presents a simple and user-friendly API to allow users to easily keep track of the dependencies of their tasks. Scheduling a task is as easy as:
 
@@ -16,7 +16,7 @@ rts::enqueue([]{ task(); });
 
 If you'd like to check out more, please read the tour of MiniRTS and try it on your own system\!
 
-## 🚀 API Example: Async Fibonacci
+## API Example: Async Fibonacci
 
 Here is a sample implementation of an asynchronous Fibonacci function using `spawn`, `when_all`, and `then` to manage dependencies.
 
@@ -43,7 +43,7 @@ core::async::Future<int> fibonacci(int n) {
 
 -----
 
-## 📊 Performance
+## Performance
 
 MiniRTS was designed to offer low-latency and low-overhead task scheduling. Under the `bench/` folder, you can find a benchmarking suite that benchmarks various operations, like:
 
@@ -79,11 +79,11 @@ BM_Enqueue_Latency_1_000_000/1/1048576      148 ms          148 ms          5 Qu
 
 -----
 
-## 🗺️ What's Next? (Roadmap)
+## What's Next? (Roadmap)
 
 In the near future, we aim to introduce a few new features that could help performance and ease of use:
 
   * Implement HPX-style `task_blocks` for scoped parallelism.
   * Look deeper into custom allocators (The library currently uses `new`/`delete` on task creation and destruction. Custom allocators can reduce that overhead.)
-  * Look into false sharing optimizations for `Worker` and `Thread Pool` objects. (The queues already use `hardware_destructuve_interference` properly.)
+  * Look into false sharing optimizations for Worker and ThreadPool objects. (The queues already use `hardware_destructuve_interference` properly.)
   * Research benchmarking in more depth and try to find better ways to benchmark MiniRTS, including adding benchmarks for more cores.
