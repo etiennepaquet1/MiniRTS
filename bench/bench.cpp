@@ -115,7 +115,7 @@ BENCHMARK(BM_Enqueue_Overhead_1_000_000)
 
 
 
-// Measures the latency of enqueuing 1 million empty tasks with async()
+// Measures the latency of enqueuing 1 million empty tasks with spawn()
 // (e.g. the time between enqueuing the first task and finishing the final task.)
 static void BM_Async_Throughput_1_000_000(benchmark::State &state) {
     pin_to_core(5);
@@ -251,7 +251,7 @@ BENCHMARK(BM_Async_Latency_Single_Task)
     ->Unit(benchmark::kMillisecond);
 
 
-// Measures the overhead of enqueuing 1 million small wait tasks with async()
+// Measures the overhead of enqueuing 1 million small wait tasks with spawn()
 // (e.g. the time between enqueuing the first task and finishing the final task
 // minus the total processing time of the tasks.)
 
@@ -374,10 +374,10 @@ static void BM_Then_Registration_1_000_000(benchmark::State &state) {
         rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
 
         // Prepare a pre-built future so that only .then() is timed
-        std::vector<core::async::Future<void>> futures;
+        std::vector<spawn::Future<void>> futures;
         futures.reserve(LOOP);
         for (int i = 0; i < LOOP; ++i) {
-            core::async::Promise<void> p;
+            spawn::Promise<void> p;
             futures.push_back(p.get_future());
         }
 

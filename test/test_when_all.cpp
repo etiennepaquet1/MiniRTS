@@ -5,6 +5,7 @@
 #include "runtime.h"
 #include "utils.h"
 #include "default_thread_pool.h"
+#include "when_all.h"
 
 
 TEST(ThreadPoolTests, TestWhenAll) {
@@ -14,8 +15,8 @@ TEST(ThreadPoolTests, TestWhenAll) {
         rts::initialize_runtime(1, 64);
     }) << "initialize_runtime() should not throw.";
 
-    core::async::Future<std::tuple<int>> tup = rts::when_all(
-        rts::async([] { return 1; })
+    rts::async::Future<std::tuple<int>> tup = rts::async::when_all(
+        rts::async::spawn([] { return 1; })
     );
     tup.then([](auto v){ std::cout << std::get<0>(v) << std::endl; });
 
@@ -32,8 +33,8 @@ TEST(ThreadPoolTests, TestWhenAll) {
 //         rts::initialize_runtime<rts::DefaultThreadPool>(1, 64);
 //     }) << "initialize_runtime() should not throw.";
 //
-//     auto tup = rts::when_all(
-//         rts::async([] {
+//     auto tup = async::when_all(
+//         async::spawn([] {
 //             debug_print() << "1";
 //         })
 //     );

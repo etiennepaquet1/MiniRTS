@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <thread>
 
-namespace core {
+namespace rts::core {
 
     /**
      * @brief Cache-line size used for padding and alignment.

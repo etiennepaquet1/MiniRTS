@@ -1,6 +1,6 @@
 #include "worker.h"
 
-void core::Worker::run(size_t num_threads) noexcept {
+void rts::core::Worker::run(size_t num_threads) noexcept {
     active_workers_->fetch_add(1, std::memory_order_release);
 
     thread_ = std::thread([this, num_threads] {

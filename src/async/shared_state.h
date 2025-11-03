@@ -12,7 +12,7 @@
 
 #include "task.h"
 
-namespace core::async {
+namespace rts::async {
 
     /**
      * @brief Shared state between a Promise<T> and its corresponding Future<T>.
@@ -46,4 +46,4 @@ namespace core::async {
         std::vector<Task> continuations;
     };
 
-} // namespace core::async
+} // namespace spawn

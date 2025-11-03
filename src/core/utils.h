@@ -69,7 +69,7 @@ inline std::ostream& null_stream() {
 }
 
 inline std::ostream& debug_print() {
-    if constexpr (core::DEBUG) {
+    if constexpr (rts::core::DEBUG) {
         static std::mutex mtx;
         std::lock_guard<std::mutex> lock(mtx);
         std::cout << "[Thread ID: " << std::this_thread::get_id() << "]: ";

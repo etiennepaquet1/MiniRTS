@@ -9,12 +9,12 @@
 #include <utility>
 #include <atomic>
 #include <exception>
+#include <variant>
 #include "future.h"
 #include "promise.h"
 
 
-namespace core::async {
-// Helper alias at namespace scope
+namespace rts::async {
 
 template <typename F>
 using future_value_t = typename std::decay_t<F>::value_type;
@@ -98,4 +98,4 @@ auto when_all(Futures&&... futures) {
         return out; // return here (different type), but only this branch is active
     }
 }
-} // namespace core::async
+} // namespace rts::async
