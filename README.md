@@ -41,30 +41,36 @@ core::async::Future<int> fibonacci(int n) {
 }
 ```
 
+-----
 
-## A Tour of MiniRTS
+## 🧭 A Tour of MiniRTS
+
 Here is a walkthrough of the core API features.
 
-1. Initialization
-To instantiate a new runtime, simply call rts::initialize_runtime(). By default, this will spawn a DefaultThreadPool with as many workers as there are hardware cores.
+### 1\. Initialization
 
-C++
+To instantiate a new runtime, simply call `rts::initialize_runtime()`. By default, this will spawn a `DefaultThreadPool` with as many workers as there are hardware cores.
 
+```cpp
 // To instantiate a new runtime, simply call rts::initialize_runtime().
 // By default this will spawn a DefaultThreadPool with as many workers as the # of cores on your hardware.
 rts::initialize_runtime();
-2. Enqueuing Simple Tasks
-Our thread pool and its workers are now ready. Use rts::enqueue() for independent, "fire-and-forget" tasks that don't require a return value.
+```
 
-C++
+### 2\. Enqueuing Simple Tasks
 
+Our thread pool and its workers are now ready. Use `rts::enqueue()` for independent, "fire-and-forget" tasks that don't require a return value.
+
+```cpp
 // Use rts::enqueue() for independent tasks.
 rts::enqueue([] { std::cout << "Hello from Worker" << std::endl; });
-3. Spawning Tasks with Futures
-If you need to get a result back from a task, use rts::async::spawn(). This returns a Future of the specified type. You can block and wait for the result using .get().
+```
 
-C++
+### 3\. Spawning Tasks with Futures
 
+If you need to get a result back from a task, use `rts::async::spawn()`. This returns a `Future` of the specified type. You can block and wait for the result using `.get()`.
+
+```cpp
 // If we need the result of the task, we will need to use Futures.
 // Simply declare a Future of the type you want returned.
 rts::async::Future<int> f1 = rts::async::spawn([] {
@@ -73,13 +79,15 @@ rts::async::Future<int> f1 = rts::async::spawn([] {
 
 // And wait for it using Future.get().
 std::cout << f1.get() << std::endl;
-4. Chaining Continuations with .then()
-The best way to use a Future's result is to attach a continuation task using .then(). This continuation will automatically execute once the Future is ready, receiving the result as an argument.
+```
 
-You can chain multiple .then() calls to create a pipeline of dependent operations.
+### 4\. Chaining Continuations with .then()
 
-C++
+The best way to use a Future's result is to attach a *continuation* task using `.then()`. This continuation will automatically execute once the Future is ready, receiving the result as an argument.
 
+You can chain multiple `.then()` calls to create a pipeline of dependent operations.
+
+```cpp
 rts::async::Future<int> f2 = rts::async::spawn([] {
     return 299'792'458;
 });
@@ -97,20 +105,23 @@ auto f4 = f3.then([](double x) {
 auto f5 = f4.then([](double x) {
     return x / 6.67430;
 });
-You can also register multiple independent continuations on the same Future.
+```
 
-C++
+You can also register multiple independent continuations on the *same* Future.
 
+```cpp
 // You can also register multiple continuations on the same Future:
 auto f6 = rts::async::spawn([] {});
 
 f6.then([] {}); // This will run when f6 is ready
 f6.then([] {}); // This will *also* run when f6 is ready
-5. Composing Futures with when_all()
-To wait for multiple Futures to complete before running a continuation, use rts::when_all(). This is perfect for "fan-out, fan-in" parallelism. It combines several Futures into a single new Future that holds a std::tuple of all the results.
+```
 
-C++
+### 5\. Composing Futures with when\_all()
 
+To wait for multiple Futures to complete before running a continuation, use `rts::when_all()`. This is perfect for "fan-out, fan-in" parallelism. It combines several Futures into a single new Future that holds a `std::tuple` of all the results.
+
+```cpp
 // This is useful when you have multiple spawn operations that can run in parallel
 // but whose results are needed together at a later point.
 auto f7 = rts::async::spawn([] {
@@ -136,11 +147,13 @@ auto f10 = all.then([](std::tuple<int, int, int> results) {
 
 // Or simply block until the combined result is ready:
 std::cout << f10.get() << std::endl;
-6. Exception Propagation
-MiniRTS propagates exceptions thrown inside tasks through their Futures. You can catch these exceptions by wrapping .get() in a try/catch block.
+```
 
-C++
+### 6\. Exception Propagation
 
+MiniRTS propagates exceptions thrown inside tasks through their Futures. You can catch these exceptions by wrapping `.get()` in a `try/catch` block.
+
+```cpp
 // Let's throw an exception from a task:
 auto f_ex = rts::async::spawn([]() -> int {
     throw std::runtime_error("boom");
@@ -154,10 +167,11 @@ try {
 } catch (const std::exception& e) {
     std::cout << "Caught exception from task: " << e.what() << std::endl;
 }
-Important: If a Future enters an exceptional state, its .then() continuations will not execute. The exception is propagated directly to the final Future in the chain.
+```
 
-C++
+> **Important:** If a Future enters an exceptional state, its `.then()` continuations **will not** execute. The exception is propagated directly to the final Future in the chain.
 
+```cpp
 // Note: Your continuation WILL NOT execute if the Future is in an exceptional state.
 auto f_bad = rts::async::spawn([]() -> int { throw std::runtime_error("kaboom"); })
     .then([](int) {
@@ -170,17 +184,20 @@ try {
 } catch (const std::exception& e) {
     std::cout << "Continuation not executed; caught exception: " << e.what() << std::endl;
 }
-7. Shutdown
+```
+
+### 7\. Shutdown
+
 Once you're finished submitting tasks, don't forget to shut down the runtime.
 
-rts::finalize_soft(): A graceful shutdown. Workers will finish all tasks currently in their queues.
+  * `rts::finalize_soft()`: A graceful shutdown. Workers will finish all tasks currently in their queues.
+  * `rts::finalize_hard()`: Stops all workers immediately.
 
-rts::finalize_hard(): Stops all workers immediately.
+<!-- end list -->
 
-C++
-
+```cpp
 rts::finalize_soft();
-
+```
 
 -----
 
