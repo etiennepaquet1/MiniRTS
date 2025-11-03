@@ -244,7 +244,9 @@ The thread pool manages a collection of workers. Each worker continuously execut
 
 
 <img width="2048" height="1048" alt="image" src="https://github.com/user-attachments/assets/373ad3e2-4cd8-4101-9858-512933cad936" />
+
 This diagram shows the internal design of each worker thread in the MiniRTS runtime system. Tasks submitted from the thread pool are first placed into a worker’s SPSC queue. When a worker's WSQ is empty, the worker drains its contents into its work-stealing deque (WSQ), the primary structure from which the worker consumes tasks. Each worker continuously pops tasks from the bottom of its own deque. When a worker’s SPSC queue becomes empty, it attempts to steal tasks from the top of another worker’s deque. Conversely, when continuations (e.g., .then() chains) are created, they are enqueued directly back into the same worker’s local WSQ to maintain NUMA locality and cache affinity.
+
 -----
 
 ## What's Next? (Roadmap)
