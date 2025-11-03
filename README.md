@@ -85,5 +85,6 @@ In the near future, we aim to introduce a few new features that could help perfo
 
   * Implement HPX-style `task_blocks` for scoped parallelism.
   * Look deeper into custom allocators (The library currently uses `new`/`delete` on task creation and destruction. Custom allocators can reduce that overhead.)
+  * Look into adding an inline buffer into Task objects for small callables
   * Look into false sharing optimizations for Worker and ThreadPool objects. (The queues already use `hardware_destructuve_interference` properly.)
   * Research benchmarking in more depth and try to find better ways to benchmark MiniRTS, including adding benchmarks for more cores.
