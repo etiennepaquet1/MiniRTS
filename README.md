@@ -242,6 +242,7 @@ BM_Enqueue_Latency_1_000_000/1/1048576      148 ms          148 ms          5 Qu
 This diagram illustrates the core scheduling flow in the MiniRTS runtime system. User code submits a callable through rts::enqueue(task) or rts::async::spawn(task), which passes it to the central thread pool for distribution. 
 The thread pool manages a collection of workers. Each worker continuously executes tasks from its own deque; if a worker’s queue becomes empty, it attempts to steal work from another worker’s deque. This decentralized, work-stealing model balances load dynamically across cores.
 
+---
 
 <img width="2048" height="1048" alt="image" src="https://github.com/user-attachments/assets/373ad3e2-4cd8-4101-9858-512933cad936" />
 
