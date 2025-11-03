@@ -5,4 +5,5 @@
 
 #include "promise.h"
 #include "future.h"
+#include "spawn.h"
 #include "when_all.h"

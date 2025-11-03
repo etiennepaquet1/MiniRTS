@@ -1,11 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "future.h"
-#include "promise.h"
-#include "runtime.h"
+
+#include "api.h"
 #include "utils.h"
-#include "default_thread_pool.h"
-#include "when_all.h"
 
 
 TEST(ThreadPoolTests, TestWhenAll) {

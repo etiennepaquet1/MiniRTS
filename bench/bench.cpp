@@ -2,10 +2,7 @@
 #include <syncstream>
 #include <iostream>
 
-#include "runtime.h"
-#include "future.h"
-#include "promise.h"
-#include "default_thread_pool.h"
+#include "api.h"
 #include "bench_utils.h"
 
 
