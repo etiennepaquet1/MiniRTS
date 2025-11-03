@@ -43,7 +43,7 @@ core::async::Future<int> fibonacci(int n) {
 
 -----
 
-## 🧭 A Tour of MiniRTS
+## A Tour of MiniRTS
 
 Here is a walkthrough of the core API features.
 
