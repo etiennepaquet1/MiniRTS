@@ -29,7 +29,7 @@ namespace rts::async {
 
         std::optional<T> value;               ///< The result value (if successful).
         std::exception_ptr exception;         ///< Exception captured during task execution.
-        std::vector<Task> continuations;      ///< Tasks to run once the state becomes ready.
+        std::vector<core::Task> continuations;      ///< Tasks to run once the state becomes ready.
     };
 
     /**
@@ -43,7 +43,7 @@ namespace rts::async {
         std::atomic<bool> ready{false};
 
         std::exception_ptr exception;
-        std::vector<Task> continuations;
+        std::vector<core::Task> continuations;
     };
 
 } // namespace spawn

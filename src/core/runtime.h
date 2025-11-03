@@ -45,7 +45,7 @@ namespace rts::core {
 
     /// @brief Cached saturation metric for monitoring queue load (optional diagnostic).
     inline float saturation_cached = 0.0f;
-} // namespace core
+} // namespace rts::core
 
 namespace rts
 {
@@ -82,7 +82,7 @@ namespace rts
             core::active_thread_pool = pool;
 
             // Bind enqueue function pointer
-            core::enqueue_fn = [](Task&& task) noexcept {
+            core::enqueue_fn = [](core::Task&& task) noexcept {
                 assert(core::active_thread_pool && "No active thread pool set");
                 assert(task && "Attempting to enqueue an empty task");
                 static_cast<T*>(core::active_thread_pool)->enqueue(std::move(task));
@@ -142,7 +142,7 @@ namespace rts
      * @param task Callable wrapped as rts::Task.
      * @note This function dispatches via the pool-specific enqueue_fn set at initialization.
      */
-    inline void enqueue(Task&& task) noexcept {
+    inline void enqueue(core::Task&& task) noexcept {
         assert(core::running.load(std::memory_order_acquire) && "enqueue() called on inactive runtime");
         assert(core::enqueue_fn && "enqueue() called before initialization");
         assert(task && "Attempting to enqueue an empty task");

@@ -64,3 +64,4 @@ namespace rts::core {
         SOFT_SHUTDOWN = 2
     };
 }
+ // namespace rts::core

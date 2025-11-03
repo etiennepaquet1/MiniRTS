@@ -20,7 +20,7 @@ namespace rts {
     /**
      * @brief Schedules a Task for asynchronous execution within the runtime system.
      */
-    void enqueue(Task &&) noexcept;
+    void enqueue(core::Task &&) noexcept;
 }
 
 namespace rts::async {

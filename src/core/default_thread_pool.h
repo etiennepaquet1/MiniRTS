@@ -170,4 +170,4 @@ namespace rts::core {
 
     static_assert(ThreadPool<DefaultThreadPool>,
                   "DefaultThreadPool must satisfy the ThreadPool concept");
-} // namespace core
+} // namespace rts::core

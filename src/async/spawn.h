@@ -48,7 +48,7 @@ namespace rts::async {
         auto fut = p.get_future();
 
         // Capture the promise by value (moved)
-        Task task = [func = std::forward<F>(f),
+        core::Task task = [func = std::forward<F>(f),
                      args_tuple = std::make_tuple(std::forward<Args>(args)...),
                      p = std::move(p)]() mutable {
             try {
