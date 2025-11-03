@@ -4,9 +4,9 @@ A work-stealing task scheduling library designed for fine-grained, latency-sensi
 
 ## Overview
 
-MiniRTS is a performance-oriented C++23 task runtime that implements a lightweight work-stealing scheduler and a continuation-based async framework. It allows developers to launch millions of fine-grained tasks with **sub-microsecond scheduling overhead**, using a per-core work-stealing deque design inspired by research runtimes like libfork and HPX.
+MiniRTS is a performance-oriented C++23 task runtime that implements a lightweight work-stealing scheduler and a continuation-based async framework. It allows developers to launch millions of fine-grained tasks with sub-microsecond scheduling overhead, using a per-core work-stealing deque design inspired by research runtimes like libfork and HPX.
 
-The runtime provides **Future/Promise** primitives with support for continuation chaining (`then()`) and composition (`when_all() / when_any()`). MiniRTS is designed for applications where scheduling overhead and latency must be minimized. It uses NUMA-friendly work-stealing by keeping continuations local to their producing worker, minimizing cross-core contention.
+The runtime provides Future/Promise primitives with support for continuation chaining (`then()`) and composition (`when_all() / when_any()`). MiniRTS is designed for applications where scheduling overhead and latency must be minimized. It uses NUMA-friendly work-stealing by keeping continuations local to their producing worker, minimizing cross-core contention.
 
 MiniRTS presents a simple and user-friendly API to allow users to easily keep track of the dependencies of their tasks. Scheduling a task is as easy as:
 
