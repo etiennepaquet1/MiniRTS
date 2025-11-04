@@ -25,7 +25,7 @@
 #include "worker.h"
 #include "utils.h"
 
-namespace core {
+namespace rts::core {
 
     /**
      * @brief The default thread pool used by MiniRTS.
@@ -170,4 +170,4 @@ namespace core {
 
     static_assert(ThreadPool<DefaultThreadPool>,
                   "DefaultThreadPool must satisfy the ThreadPool concept");
-} // namespace core
+} // namespace rts::core

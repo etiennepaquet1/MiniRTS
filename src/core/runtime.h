@@ -24,16 +24,7 @@
 #include "thread_pool.h"
 #include "constants.h"
 
-namespace core::async {
-    template <typename T>
-    class Promise;
-
-    template <typename T>
-    requires concepts::FutureValue<T>
-    class Future;
-}
-
-namespace core {
+namespace rts::core {
     class DefaultThreadPool;
 
     // ─────────────────────────────────────────────────────────────
@@ -54,7 +45,7 @@ namespace core {
 
     /// @brief Cached saturation metric for monitoring queue load (optional diagnostic).
     inline float saturation_cached = 0.0f;
-} // namespace core
+} // namespace rts::core
 
 namespace rts
 {
@@ -91,7 +82,7 @@ namespace rts
             core::active_thread_pool = pool;
 
             // Bind enqueue function pointer
-            core::enqueue_fn = [](Task&& task) noexcept {
+            core::enqueue_fn = [](core::Task&& task) noexcept {
                 assert(core::active_thread_pool && "No active thread pool set");
                 assert(task && "Attempting to enqueue an empty task");
                 static_cast<T*>(core::active_thread_pool)->enqueue(std::move(task));
@@ -151,117 +142,11 @@ namespace rts
      * @param task Callable wrapped as rts::Task.
      * @note This function dispatches via the pool-specific enqueue_fn set at initialization.
      */
-    inline void enqueue(Task&& task) noexcept {
+    inline void enqueue(core::Task&& task) noexcept {
         assert(core::running.load(std::memory_order_acquire) && "enqueue() called on inactive runtime");
         assert(core::enqueue_fn && "enqueue() called before initialization");
         assert(task && "Attempting to enqueue an empty task");
         core::enqueue_fn(std::move(task));
     }
 
-    /**
-     * @brief Asynchronously enqueues a callable for execution and returns a Future for its result.
-     *
-     * @tparam F Callable type.
-     * @tparam Args Argument pack for callable.
-     * @return async::Future<T> representing the result.
-     *
-     * @note The callable is executed inside the runtime’s thread pool.
-     */
-    template<typename F, typename... Args>
-    auto async(F&& f, Args&&... args)
-        -> core::async::Future<std::invoke_result_t<F, Args...>> {
-
-        using T = std::invoke_result_t<F, Args...>;
-
-        assert(core::running.load(std::memory_order_acquire) && "enqueue_async() called on inactive runtime");
-        assert(core::enqueue_fn && "enqueue_async() called before initialization");
-
-        core::async::Promise<T> p;
-        auto fut = p.get_future();
-
-        // Capture the promise by value (moved)
-        Task task = [func = std::forward<F>(f),
-                     args_tuple = std::make_tuple(std::forward<Args>(args)...),
-                     p = std::move(p)]() mutable {
-            try {
-                if constexpr (std::is_void_v<T>) {
-                    std::apply(func, std::move(args_tuple));
-                    p.set_value();
-                } else {
-                    T result = std::apply(func, std::move(args_tuple));
-                    p.set_value(std::move(result));
-                }
-            } catch (...) {
-                p.set_exception(std::current_exception());
-            }
-        };
-
-        enqueue(std::move(task));
-        return fut;
-    }
-
-    // ─────────────────────────────────────────────────────────────
-    // ────────────────────────  when_all()  ───────────────────────
-    // ─────────────────────────────────────────────────────────────
-
-    /**
-     * @brief Combines multiple futures into one future that resolves
-     *        when all input futures have completed successfully.
-     *
-     * @tparam Futures Variadic pack of async::Future<T> types.
-     * @param futures The input futures to wait on.
-     * @return async::Future<std::tuple<...>> containing all results.
-     *
-     * @note This overload does not yet handle Future<void> types.
-     *       Use the specialized version (TODO) when available.
-     */
-    template <typename... Futures>
-    auto when_all(Futures&&... futures) {
-        using ResultTuple = std::tuple<typename std::decay_t<Futures>::value_type...>;
-        using StateTuple  = std::tuple<std::optional<typename std::decay_t<Futures>::value_type>...>;
-
-        core::async::Promise<ResultTuple> prom;
-        auto out = prom.get_future();
-
-        constexpr std::size_t N = sizeof...(Futures);
-        if constexpr (N == 0) {
-            prom.set_value(ResultTuple{});
-            return out;
-        }
-
-        auto state     = std::make_shared<StateTuple>();
-        auto remaining = std::make_shared<std::atomic<std::size_t>>(N);
-
-        // Called after each future completes; builds result tuple when last finishes.
-        auto fulfill = [prom = std::move(prom), state, remaining]() mutable {
-            assert(remaining && "Remaining counter null");
-            assert(state && "State tuple null");
-            if (remaining->fetch_sub(1, std::memory_order_acq_rel) == 1) {
-                auto result = std::apply(
-                    []<typename... Ts>(std::optional<Ts>&... opts) -> ResultTuple {
-                        return ResultTuple{ std::move(*opts)... };
-                    },
-                    *state
-                );
-                prom.set_value(std::move(result));
-            }
-        };
-
-        // Attach continuations per input future.
-        auto attach_one = [state, fulfill](auto& fut, [[maybe_unused]] auto index_c) {
-            constexpr std::size_t I = decltype(index_c)::value;
-            fut.then([state, fulfill](auto&& v) mutable {
-                std::get<I>(*state).emplace(std::forward<decltype(v)>(v));
-                fulfill();
-            });
-        };
-
-        // Generate indices [0..N) and attach
-        [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-            (attach_one(futures, std::integral_constant<std::size_t, Is>{}), ...);
-        }(std::index_sequence_for<Futures...>{});
-
-        return out;
-    }
-
-} // namespace rts
+}// namespace rts

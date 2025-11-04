@@ -2,10 +2,7 @@
 #include <syncstream>
 #include <iostream>
 
-#include "runtime.h"
-#include "future.h"
-#include "promise.h"
-#include "default_thread_pool.h"
+#include "api.h"
 #include "bench_utils.h"
 
 
@@ -23,7 +20,7 @@ static void BM_Enqueue_Throughput_1_000_000(benchmark::State &state) {
         state.PauseTiming();
 
         // Initialize runtime with current configuration
-        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<rts::core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
@@ -78,7 +75,7 @@ static void BM_Enqueue_Overhead_1_000_000(benchmark::State &state) {
         state.PauseTiming();
 
         // Initialize runtime with current configuration
-        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<rts::core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
@@ -115,7 +112,7 @@ BENCHMARK(BM_Enqueue_Overhead_1_000_000)
 
 
 
-// Measures the latency of enqueuing 1 million empty tasks with async()
+// Measures the latency of enqueuing 1 million empty tasks with spawn()
 // (e.g. the time between enqueuing the first task and finishing the final task.)
 static void BM_Async_Throughput_1_000_000(benchmark::State &state) {
     pin_to_core(5);
@@ -127,14 +124,14 @@ static void BM_Async_Throughput_1_000_000(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
 
-        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<rts::core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
         auto start = std::chrono::steady_clock::now();
 
         for (int i = 0; i < LOOP; ++i) {
-            rts::async([]{});
+            rts::async::spawn([]{});
         }
 
         rts::finalize_soft();
@@ -167,7 +164,7 @@ static void BM_Enqueue_Latency_Single_Task(benchmark::State &state) {
 
     for (auto _ : state) {
         state.PauseTiming();
-        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<rts::core::DefaultThreadPool>(num_threads, queue_capacity);
         state.ResumeTiming();
 
         double total_ns = 0.0;
@@ -214,7 +211,7 @@ static void BM_Async_Latency_Single_Task(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
 
-        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<rts::core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
@@ -251,7 +248,7 @@ BENCHMARK(BM_Async_Latency_Single_Task)
     ->Unit(benchmark::kMillisecond);
 
 
-// Measures the overhead of enqueuing 1 million small wait tasks with async()
+// Measures the overhead of enqueuing 1 million small wait tasks with spawn()
 // (e.g. the time between enqueuing the first task and finishing the final task
 // minus the total processing time of the tasks.)
 
@@ -274,14 +271,14 @@ static void BM_Async_Overhead_1_000_000(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
 
-        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<rts::core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
         auto start = std::chrono::steady_clock::now();
 
         for (int i = 0; i < LOOP; ++i) {
-            rts::async([reps] {
+            rts::async::spawn([reps] {
                 int iter {reps};
                 benchmark::DoNotOptimize(iter);
                 for (int i = 0; i < iter; ++i) {
@@ -321,13 +318,13 @@ static void BM_Then_Chain_1_000_000(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
 
-        rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
+        rts::initialize_runtime<rts::core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
         auto start = std::chrono::steady_clock::now();
 
-        auto fut = rts::async([] {});
+        auto fut = rts::async::spawn([] {});
         for (int i = 0; i < LOOP; ++i)
             fut = fut.then([] {});
 
@@ -374,10 +371,10 @@ static void BM_Then_Registration_1_000_000(benchmark::State &state) {
         rts::initialize_runtime<core::DefaultThreadPool>(num_threads, queue_capacity);
 
         // Prepare a pre-built future so that only .then() is timed
-        std::vector<core::async::Future<void>> futures;
+        std::vector<spawn::Future<void>> futures;
         futures.reserve(LOOP);
         for (int i = 0; i < LOOP; ++i) {
-            core::async::Promise<void> p;
+            spawn::Promise<void> p;
             futures.push_back(p.get_future());
         }
 

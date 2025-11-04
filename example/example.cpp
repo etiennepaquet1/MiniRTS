@@ -13,7 +13,6 @@
 #include "api.h"
 
 
-
 int main() {
 
 
@@ -30,9 +29,9 @@ int main() {
 
 
 // If we need the result of the task, we will need to use Futures.
-// Simply declare an async::Future of the type you want returned.
+// Simply declare an spawn::Future of the type you want returned.
 
-    core::async::Future<int> f1 = rts::async([] {
+    rts::async::Future<int> f1 = rts::async::spawn([] {
         return 3141592;
     });
 
@@ -43,7 +42,7 @@ int main() {
 // Awesome. But what if you want to use that result as the input for another operation?
 // The best way to do this is to use Future.then()
 
-    core::async::Future<int> f2 = rts::async([] {
+    rts::async::Future<int> f2 = rts::async::spawn([] {
         return 299'792'458;
     });
 
@@ -68,7 +67,7 @@ int main() {
 
 // You can also register multiple continuations on the same Future:
 
-    auto f6 = rts::async([] {});
+    auto f6 = rts::async::spawn([] {});
 
     f6.then([] {});
     f6.then([] {});
@@ -77,24 +76,24 @@ int main() {
 // You can also wait for multiple Futures to complete before continuing.
 // Use rts::when_all() to combine several Futures into one composite Future.
 
-// This is useful when you have multiple async operations that can run in parallel
+// This is useful when you have multiple spawn operations that can run in parallel
 // but whose results are needed together at a later point.
 
-auto f7 = rts::async([] {
+auto f7 = rts::async::spawn([] {
     return 21;
 });
 
-auto f8 = rts::async([] {
+auto f8 = rts::async::spawn([] {
     return 2;
 });
 
-auto f9 = rts::async([] {
+auto f9 = rts::async::spawn([] {
     return 1;
 });
 
 // rts::when_all() returns a Future containing a std::tuple of all results.
 
-auto all = rts::when_all(std::move(f7), std::move(f8), std::move(f9));
+auto all = rts::async::when_all(std::move(f7), std::move(f8), std::move(f9));
 
 // We can now attach a continuation that takes the tuple as input:
 

@@ -23,7 +23,7 @@
 #include "SPSCQueue.h"
 #include "deque.hpp"
 
-namespace core {
+namespace rts::core {
 
     /**
      * @brief Forward declaration for TLS pointer.

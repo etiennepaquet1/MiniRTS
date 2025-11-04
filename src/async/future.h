@@ -20,10 +20,10 @@ namespace rts {
     /**
      * @brief Schedules a Task for asynchronous execution within the runtime system.
      */
-    void enqueue(Task &&) noexcept;
+    void enqueue(core::Task &&) noexcept;
 }
 
-namespace core::async {
+namespace rts::async {
 
     template<typename T>
     class Promise;
@@ -36,7 +36,7 @@ namespace core::async {
      * @tparam T The type of value produced by the associated Promise.
      */
     template<typename T>
-    requires concepts::FutureValue<T>
+    requires rts::core::concepts::FutureValue<T>
     class Future {
         std::shared_ptr<SharedState<T>> state_;
 
@@ -198,4 +198,4 @@ namespace core::async {
         return fut_next;
     }
 
-} // namespace rts::async
+} // namespace rts::spawn

@@ -21,7 +21,7 @@
 #include "future.h"
 #include "worker.h"
 
-namespace core::async {
+namespace rts::async {
 
     /**
      * @brief Promise<T> acts as the producer counterpart to Future<T>.
@@ -82,7 +82,7 @@ namespace core::async {
          */
         template<typename U = T>
         void set_value(U &&value) noexcept requires (!std::is_void_v<U> &&
-                                                     concepts::PromiseValue<U>) {
+                                                     core::concepts::PromiseValue<U>) {
             assert(state_ && "set_value() called on moved-from Promise");
 
             {
@@ -97,7 +97,7 @@ namespace core::async {
             for (auto& cont : state_->continuations) {
                 assert(cont && "Continuation is invalid");
                 assert(tls_worker && "tls_worker must be set for local enqueue");
-                tls_worker->enqueue_local(std::move(cont));
+                core::tls_worker->enqueue_local(std::move(cont));
             }
         }
 
@@ -117,7 +117,7 @@ namespace core::async {
             for (auto& cont : state_->continuations) {
                 assert(cont && "Continuation is invalid");
                 assert(tls_worker && "tls_worker must be set for local enqueue");
-                tls_worker->enqueue_local(std::move(cont));
+                core::tls_worker->enqueue_local(std::move(cont));
             }
         }
 
@@ -144,4 +144,4 @@ namespace core::async {
         }
     };
 
-} // namespace core::async
+} // namespace spawn
