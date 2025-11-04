@@ -222,17 +222,17 @@ Here's a sample of benchmark results run with `chrt -r 99` and isolated cores.
   * **CPU:** Intel i5-8400 @ 3.80GHz
   * **Compiler:** g++ 13.3.0
 
-**Benchmark Output (`BM_Enqueue_Latency_1_000_000` / 1 Thread):**
+**Benchmark Output (`BM_Enqueue_Throughput_1_000_000` / 1 Thread):**
 
 ```bash
-BM_Enqueue_Latency_1_000_000/1/64           176 ms          172 ms          4 QueueCapacity=64 Threads=1 Throughput_Mops=6.86724 ns_per_task=145.619
-BM_Enqueue_Latency_1_000_000/1/256          144 ms          143 ms          5 QueueCapacity=256 Threads=1 Throughput_Mops=7.03875 ns_per_task=142.071
-BM_Enqueue_Latency_1_000_000/1/1024         141 ms          141 ms          5 QueueCapacity=1.024k Threads=1 Throughput_Mops=7.03468 ns_per_task=142.153
-BM_Enqueue_Latency_1_000_000/1/4096         136 ms          136 ms          5 QueueCapacity=4.096k Threads=1 Throughput_Mops=7.56674 ns_per_task=132.157
-BM_Enqueue_Latency_1_000_000/1/16384        131 ms          130 ms          5 QueueCapacity=16.384k Threads=1 Throughput_Mops=7.76566 ns_per_task=128.772
-BM_Enqueue_Latency_1_000_000/1/65536        134 ms          134 ms          5 QueueCapacity=65.536k Threads=1 Throughput_Mops=7.44495 ns_per_task=134.319
-BM_Enqueue_Latency_1_000_000/1/262144       137 ms          137 ms          5 QueueCapacity=262.144k Threads=1 Throughput_Mops=7.17327 ns_per_task=139.406
-BM_Enqueue_Latency_1_000_000/1/1048576      148 ms          148 ms          5 QueueCapacity=1.04858M Threads=1 Throughput_Mops=6.74625 ns_per_task=148.23
+BM_Enqueue_Throughput_1_000_000/1/64             150 ms          149 ms            5 QueueCapacity=64 Threads=1 Throughput_Mops=6.74329 ns_per_task=148.296
+BM_Enqueue_Throughput_1_000_000/1/256            147 ms          147 ms            5 QueueCapacity=256 Threads=1 Throughput_Mops=6.87166 ns_per_task=145.525
+BM_Enqueue_Throughput_1_000_000/1/1024           145 ms          145 ms            5 QueueCapacity=1.024k Threads=1 Throughput_Mops=6.80768 ns_per_task=146.893
+BM_Enqueue_Throughput_1_000_000/1/4096           144 ms          144 ms            5 QueueCapacity=4.096k Threads=1 Throughput_Mops=6.85911 ns_per_task=145.792
+BM_Enqueue_Throughput_1_000_000/1/16384          141 ms          141 ms            5 QueueCapacity=16.384k Threads=1 Throughput_Mops=7.01372 ns_per_task=142.578
+BM_Enqueue_Throughput_1_000_000/1/65536          141 ms          141 ms            5 QueueCapacity=65.536k Threads=1 Throughput_Mops=6.99345 ns_per_task=142.991
+BM_Enqueue_Throughput_1_000_000/1/262144         147 ms          147 ms            5 QueueCapacity=262.144k Threads=1 Throughput_Mops=6.74369 ns_per_task=148.287
+BM_Enqueue_Throughput_1_000_000/1/1048576        156 ms          156 ms            4 QueueCapacity=1.04858M Threads=1 Throughput_Mops=6.45232 ns_per_task=154.983
 ```
 
 -----
