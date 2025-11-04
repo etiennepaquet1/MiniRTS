@@ -16,6 +16,7 @@ add_executable(MiniRTS_tests
         test_runtime.cpp
         test_future.cpp
         test_when_all.cpp
+        test_when_any.cpp
 )
 
 target_link_libraries(MiniRTS_tests
