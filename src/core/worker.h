@@ -20,8 +20,8 @@
 #include "task.h"
 #include "utils.h"
 
-#include "SPSCQueue.h"
-#include "deque.hpp"
+#include "rigtorp/SPSCQueue.h"
+#include "riften/deque.hpp"
 
 namespace rts::core {
 

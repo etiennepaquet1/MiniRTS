@@ -8,8 +8,65 @@ add_compile_options(-Wno-interference-size)
 
 include(GNUInstallDirs)
 
-option(BUILD_TESTS "Build unit tests" ON)
+# ─────────────────────────────────────────────
+# Core MiniRTS library Definition
+# ─────────────────────────────────────────────
+# Define the library target here, at the top level.
+# It starts as an empty container for sources and properties.
+add_library(MiniRTS)
 
+set_target_properties(MiniRTS PROPERTIES
+        OUTPUT_NAME minirts
+        EXPORT_NAME Runtime
+)
+
+# ─────────────────────────────────────────────
+# Include directories (Now with clean paths)
+# ─────────────────────────────────────────────
+# Set properties on the target using paths relative to the project root.
+target_include_directories(MiniRTS
+        PUBLIC
+        # Paths are now clean, relative to THIS file's location (the project root)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/api>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/core>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/async>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/ConcurrentDeque/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/SPSCQueue/include>
+
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+# Now, descend into the subdirectories. The 'src' directory will add
+# its source files to the 'MiniRTS' target we just created.
+add_subdirectory(src)
+add_subdirectory(bench)
+add_subdirectory(test)
+add_subdirectory(example)
+
+
+# ─────────────────────────────────────────────
+# Installation (Moved from /src for centralization)
+# ─────────────────────────────────────────────
+install(TARGETS MiniRTS
+        EXPORT MiniRTSTargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+# Install the export configuration that defines the MiniRTS:: namespace
+install(EXPORT MiniRTSTargets
+        FILE MiniRTSTargets.cmake
+        NAMESPACE MiniRTS::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MiniRTS
+)
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/api/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/minirts)
+
+
+option(BUILD_TESTS "Build unit tests" ON)
 if (BUILD_TESTS)
     include(CTest)
     enable_testing()
@@ -44,11 +101,6 @@ if (ENABLE_TSAN)
     add_link_options(-fsanitize=thread -fno-lto -fno-fat-lto-objects)
 endif()
 
-
-add_subdirectory(src)
-add_subdirectory(bench)
-add_subdirectory(test)
-add_subdirectory(example)
 
 install(EXPORT MiniRTSTargets
         FILE MiniRTSTargets.cmake

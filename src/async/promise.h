@@ -96,7 +96,7 @@ namespace rts::async {
             // Schedule all registered continuations
             for (auto& cont : state_->continuations) {
                 assert(cont && "Continuation is invalid");
-                assert(tls_worker && "tls_worker must be set for local enqueue");
+                assert(core::tls_worker && "tls_worker must be set for local enqueue");
                 core::tls_worker->enqueue_local(std::move(cont));
             }
         }
@@ -116,7 +116,7 @@ namespace rts::async {
 
             for (auto& cont : state_->continuations) {
                 assert(cont && "Continuation is invalid");
-                assert(tls_worker && "tls_worker must be set for local enqueue");
+                assert(core::tls_worker && "tls_worker must be set for local enqueue");
                 core::tls_worker->enqueue_local(std::move(cont));
             }
         }
