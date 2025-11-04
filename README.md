@@ -1,6 +1,6 @@
 # Welcome to MiniRTS\!
 
-A work-stealing task scheduling library designed for fine-grained, latency-sensitive parallelism in single-producer workloads.
+A task scheduling library designed for fine-grained, latency-sensitive parallelism in single-producer workloads.
 
 ## Overview
 
