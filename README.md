@@ -274,12 +274,11 @@ This clones MiniRTS into the `external/MiniRTS` directory of your project.
 In your main `CMakeLists.txt`, use CMake's `add_subdirectory()` to include MiniRTS and link it to your target:
 
 ```cmake
-# Add MiniRTS submodule
 add_subdirectory(external/MiniRTS)
 
-# Link MiniRTS to your project executable or library
-target_link_libraries(MyExecutable PRIVATE MiniRTS::Runtime)
-```
+add_executable(YourApp main.cpp)
+
+target_link_libraries(YourApp PRIVATE MiniRTS)```
 
 The `MiniRTS::Runtime` target provides access to the core runtime library.
 
@@ -290,7 +289,7 @@ The `MiniRTS::Runtime` target provides access to the core runtime library.
 Once linked, you can include and use MiniRTS like this:
 
 ```cpp
-#include <MiniRTS/src/api/api.h>
+#include <api.h>
 
 int main() {
     rts::initialize_runtime();
