@@ -143,7 +143,7 @@ namespace rts::core {
                 sum += wkr.wsq_size();
             }
 
-            const double total = static_cast<double>(workers_->size() * queue_capacity_);
+            const auto total = static_cast<double>(workers_->size() * queue_capacity_);
             assert(total > 0.0);
             return static_cast<double>(sum) / total;
         }

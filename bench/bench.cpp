@@ -7,8 +7,8 @@
 
 
 
-// Measures the latency of enqueuing 1 million empty tasks with enqueue()
-// (e.g. the time between enqueuing the first task and finishing the final task.)
+// Measures the throughput when enqueuing 1 million empty tasks with enqueue()
+// (e.g. the length per task.)
 static void BM_Enqueue_Throughput_1_000_000(benchmark::State &state) {
     pin_to_core(5);
 
@@ -19,14 +19,12 @@ static void BM_Enqueue_Throughput_1_000_000(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
 
-        // Initialize runtime with current configuration
         rts::initialize_runtime<rts::core::DefaultThreadPool>(num_threads, queue_capacity);
 
         state.ResumeTiming();
 
         auto start = std::chrono::steady_clock::now();
 
-        // Enqueue async tasks
         for (int i = 0; i < LOOP; ++i) {
             rts::enqueue([] {});
         }
@@ -37,7 +35,6 @@ static void BM_Enqueue_Throughput_1_000_000(benchmark::State &state) {
         std::chrono::duration<double, std::nano> elapsed = end - start;
 
 
-        // Record metrics
         state.counters["Threads"]       = num_threads;
         state.counters["QueueCapacity"] = queue_capacity;
         state.counters["ns_per_task"]   = elapsed.count() / LOOP;
@@ -98,7 +95,6 @@ static void BM_Enqueue_Overhead_1_000_000(benchmark::State &state) {
         std::chrono::duration<double, std::nano> elapsed = end - start;
 
 
-        // Record metrics
         state.counters["Threads"]       = num_threads;
         state.counters["QueueCapacity"] = queue_capacity;
         state.counters["overhead_ns_per_task"] = (elapsed.count() / LOOP) - (TARGET_NS / num_threads);
