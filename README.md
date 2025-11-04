@@ -278,7 +278,8 @@ add_subdirectory(external/MiniRTS)
 
 add_executable(YourApp main.cpp)
 
-target_link_libraries(YourApp PRIVATE MiniRTS)```
+target_link_libraries(YourApp PRIVATE MiniRTS)
+```
 
 The `MiniRTS::Runtime` target provides access to the core runtime library.
 
