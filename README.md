@@ -43,11 +43,15 @@ core::async::Future<int> fibonacci(int n) {
 
 -----
 
+Here is the updated "Tour of MiniRTS" document with a new **`when_any()`** section seamlessly integrated following the same format and tone as the rest of your tutorial:
+
+---
+
 ## A Tour of MiniRTS
 
 Here is a walkthrough of the core API features.
 
-### 1\. Initialization
+### 1. Initialization
 
 To instantiate a new runtime, simply call `rts::initialize_runtime()`. By default, this will spawn a `DefaultThreadPool` with as many workers as there are hardware cores.
 
@@ -57,7 +61,7 @@ To instantiate a new runtime, simply call `rts::initialize_runtime()`. By defaul
 rts::initialize_runtime();
 ```
 
-### 2\. Enqueuing Simple Tasks
+### 2. Enqueuing Simple Tasks
 
 Our thread pool and its workers are now ready. Use `rts::enqueue()` for independent, "fire-and-forget" tasks that don't require a return value.
 
@@ -66,7 +70,7 @@ Our thread pool and its workers are now ready. Use `rts::enqueue()` for independ
 rts::enqueue([] { std::cout << "Hello from Worker" << std::endl; });
 ```
 
-### 3\. Spawning Tasks with Futures
+### 3. Spawning Tasks with Futures
 
 If you need to get a result back from a task, use `rts::async::spawn()`. This returns a `Future` of the specified type. You can block and wait for the result using `.get()`.
 
@@ -81,7 +85,7 @@ rts::async::Future<int> f1 = rts::async::spawn([] {
 std::cout << f1.get() << std::endl;
 ```
 
-### 4\. Chaining Continuations with .then()
+### 4. Chaining Continuations with .then()
 
 The best way to use a Future's result is to attach a *continuation* task using `.then()`. This continuation will automatically execute once the Future is ready, receiving the result as an argument.
 
@@ -117,7 +121,7 @@ f6.then([] {}); // This will run when f6 is ready
 f6.then([] {}); // This will *also* run when f6 is ready
 ```
 
-### 5\. Composing Futures with when\_all()
+### 5. Composing Futures with when_all()
 
 To wait for multiple Futures to complete before running a continuation, use `rts::when_all()`. This is perfect for "fan-out, fan-in" parallelism. It combines several Futures into a single new Future that holds a `std::tuple` of all the results.
 
@@ -149,7 +153,32 @@ auto f10 = all.then([](std::tuple<int, int, int> results) {
 std::cout << f10.get() << std::endl;
 ```
 
-### 6\. Exception Propagation
+### 6. Waiting for the First Ready Future with when_any()
+
+In other cases, you may only care about *the first* among several Futures to complete. For this use case, use `rts::when_any()`, which returns a `Future<std::variant<...>>`. The first result to be ready is wrapped in a `std::variant`, allowing type-safe access to its value.
+
+```cpp
+// Create three tasks that return different types or no value at all:
+auto f11 = rts::async::spawn([] { return 42; });
+auto f12 = rts::async::spawn([] { return std::string("MiniRTS"); });
+auto f13 = rts::async::spawn([] { /* simulate work with no return value */ });
+
+// rts::when_any() returns a Future that resolves when ANY of the inputs resolve.
+auto any = rts::async::when_any(std::move(f11), std::move(f12), std::move(f13));
+
+// The result is stored in a std::variant:
+any.then([](auto result_variant) {
+    std::visit([](auto&& value) {
+        if constexpr (std::is_same_v<std::decay_t<decltype(value)>, std::monostate>) {
+            std::cout << "A void task completed first" << std::endl;
+        } else {
+            std::cout << "First finished result: " << value << std::endl;
+        }
+    }, result_variant);
+});
+```
+
+### 7. Exception Propagation
 
 MiniRTS propagates exceptions thrown inside tasks through their Futures. You can catch these exceptions by wrapping `.get()` in a `try/catch` block.
 
@@ -186,20 +215,19 @@ try {
 }
 ```
 
-### 7\. Shutdown
+### 8. Shutdown
 
 Once you're finished submitting tasks, don't forget to shut down the runtime.
 
-  * `rts::finalize_soft()`: A graceful shutdown. Workers will finish all tasks currently in their queues.
-  * `rts::finalize_hard()`: Stops all workers immediately.
-
-<!-- end list -->
+* `rts::finalize_soft()`: A graceful shutdown. Workers will finish all tasks currently in their queues.
+* `rts::finalize_hard()`: Stops all workers immediately.
 
 ```cpp
 rts::finalize_soft();
 ```
 
 -----
+
 
 ## Performance
 
