@@ -21,7 +21,7 @@ namespace rts {
      * @brief Schedules a Task for asynchronous execution within the runtime system.
      */
     void enqueue(core::Task &&) noexcept;
-}
+} // namespace rts
 
 namespace rts::async {
 
@@ -104,7 +104,6 @@ namespace rts::async {
             -> Future<std::invoke_result_t<F, T>>
         requires std::invocable<F, T> && std::copy_constructible<std::decay_t<F>>
         {
-
             assert(state_ && "then() called on invalid Future");
 
             using U = std::invoke_result_t<F, T>;
@@ -194,8 +193,6 @@ namespace rts::async {
                 state_->continuations.push_back(std::move(cont));
             }
         }
-
         return fut_next;
     }
-
-} // namespace rts::spawn
+} // namespace rts::async

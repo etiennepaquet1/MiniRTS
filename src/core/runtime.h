@@ -28,7 +28,7 @@ namespace rts::core {
     class DefaultThreadPool;
 
     // ─────────────────────────────────────────────────────────────
-    // ───────────────  Global runtime state and hooks  ─────────────
+    // ───────────────  Global runtime state and hooks  ────────────
     // ─────────────────────────────────────────────────────────────
 
     /// @brief Flag indicating whether the RTS is currently active.

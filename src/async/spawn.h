@@ -63,8 +63,7 @@ namespace rts::async {
                 p.set_exception(std::current_exception());
             }
         };
-
-        rts::enqueue(std::move(task));
+        enqueue(std::move(task));
         return fut;
-    } // namespace async
-}
+    }
+} // namespace rts::async
