@@ -1,6 +1,6 @@
 /*
 
-    Welcome to MiniRTS, an (almost) lock-free, low-overhead, low-latency runtime system!
+    Welcome to MiniRTS, a low-overhead, low-latency runtime system!
 
 
     MiniRTS provides an easy-to-use API to configure your runtime, create and schedule tasks and
@@ -38,6 +38,7 @@ int main() {
 // And wait for it using Future.get().
     std::cout << f1.get() << std::endl;
 
+// ----------------------------------------------------------------------------------------
 
 // Awesome. But what if you want to use that result as the input for another operation?
 // The best way to do this is to use Future.then()
@@ -91,6 +92,8 @@ auto f9 = rts::async::spawn([] {
     return 1;
 });
 
+// ----------------------------------------------------------------------------------------
+
 // rts::when_all() returns a Future containing a std::tuple of all results.
 
 auto all = rts::async::when_all(std::move(f7), std::move(f8), std::move(f9));
@@ -106,6 +109,28 @@ auto f10 = all.then([](std::tuple<int, int, int> results) {
 
 std::cout << f10.get() << std::endl;
 
+// ----------------------------------------------------------------------------------------
+
+// rts::when_any() returns a Future<std::variant<...>> where the first finished result
+// is stored in the appropriate variant alternative
+
+auto f11 = rts::async::spawn([] { return 42; });
+auto f12 = rts::async::spawn([] { return std::string("MiniRTS"); });
+auto f13 = rts::async::spawn([] { /* simulate work with no return */ });
+
+auto any = rts::async::when_any(std::move(f11), std::move(f12), std::move(f13));
+
+any.then([](auto result_variant) {
+    std::visit([](auto&& value) {
+        if constexpr (std::is_same_v<std::decay_t<decltype(value)>, std::monostate>) {
+            std::cout << "void result completed first" << std::endl;
+        } else {
+            std::cout << "first finished result: " << value << std::endl;
+        }
+    }, result_variant);
+});
+
+// ----------------------------------------------------------------------------------------
 
 // Done! Once you're finished submitting tasks, don't forget to shut down the runtime.
 // Use finalize_soft() for a graceful shutdown where the workers are allowed to finish the work
@@ -114,7 +139,7 @@ std::cout << f10.get() << std::endl;
 rts::finalize_soft();
 
 
-    return 0;
+return 0;
 }
 
 

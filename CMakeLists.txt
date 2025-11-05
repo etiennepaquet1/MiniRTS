@@ -13,7 +13,8 @@ include(GNUInstallDirs)
 # ─────────────────────────────────────────────
 # Define the library target here, at the top level.
 # It starts as an empty container for sources and properties.
-add_library(MiniRTS)
+add_library(MiniRTS
+        src/async/when_any.h)
 
 set_target_properties(MiniRTS PROPERTIES
         OUTPUT_NAME minirts
