@@ -14,7 +14,7 @@ MiniRTS presents a simple and user-friendly API to allow users to easily keep tr
 rts::enqueue([]{ task(); });
 ```
 
-If you'd like to check out more, please read the tour of MiniRTS and try it on your own system\!
+If you'd like to check out more, please read the [tour of MiniRTS](https://github.com/etiennepaquet1/MiniRTS#a-tour-of-minirts) and try it on your own system\!
 
 ## API Example: Async Fibonacci
 
