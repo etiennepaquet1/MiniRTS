@@ -43,10 +43,6 @@ core::async::Future<int> fibonacci(int n) {
 
 -----
 
-Here is the updated "Tour of MiniRTS" document with a new **`when_any()`** section seamlessly integrated following the same format and tone as the rest of your tutorial:
-
----
-
 ## A Tour of MiniRTS
 
 Here is a walkthrough of the core API features.
